@@ -16,11 +16,23 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
+const dbURI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/fos";
+
 // app.use(cors());
 app.use(cors({ origin: "https://your-frontend.vercel.app" }));
 app.use(express.json());
 
-mongoose.connect("mongodb://127.0.0.1:27017/fos");
+// mongoose.connect("mongodb://127.0.0.1:27017/fos");
+
+mongoose.connect(dbURI)
+  .then(() => console.log("✅ MongoDB Connected Successfully"))
+  .catch((err) => {
+    console.error("❌ MongoDB Connection Error:", err.message);
+    // On Render, we want to know why it's failing
+    if (dbURI.includes("127.0.0.1")) {
+      console.error("HINT: Your app is trying to connect to localhost instead of Atlas!");
+    }
+  });
 
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
