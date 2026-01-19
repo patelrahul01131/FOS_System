@@ -336,7 +336,7 @@ button {
 }
 
 .dashboard-container {
-  padding: 20px;
+  padding: 5px;
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
@@ -352,7 +352,7 @@ button {
 
 .stat-card {
   background: white;
-  padding: 20px;
+  padding: 5px;
   border-radius: 12px;
   box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
 }

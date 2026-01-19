@@ -91,7 +91,7 @@ export default function UserDashboard() {
         <div className="dashboard-container">
           <section className="profile-section">
             <UserProfile />
-          </section>
+          </section><br></br>
           
           <div className="stats-grid">
             <div className="stat-card">
