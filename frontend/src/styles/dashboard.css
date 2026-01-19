@@ -340,6 +340,7 @@ button {
   max-width: 1200px;
   margin: 0 auto;
   width: 98%;
+  overflow: scroll;
 }
 
 /* Stats Cards */
