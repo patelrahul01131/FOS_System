@@ -19,7 +19,7 @@ const server = http.createServer(app);
 const dbURI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/fos";
 
 // app.use(cors());
-app.use(cors({ origin: "https://satnamsales-noik1wyop-rahul-patels-projects-46c96a9f.vercel.app/" }));
+app.use(cors({ origin: "https://satnamsales.vercel.app" }));
 app.use(express.json());
 
 // mongoose.connect("mongodb://127.0.0.1:27017/fos");
