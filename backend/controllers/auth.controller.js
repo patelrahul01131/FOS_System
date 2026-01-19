@@ -1,4 +1,4 @@
-import User from "../models/userRoutes.js"; // Ensure this path matches your User model
+import User from "../models/User.js"; // Ensure this path matches your User model
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
