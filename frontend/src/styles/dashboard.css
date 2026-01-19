@@ -340,7 +340,6 @@ button {
   max-width: 1200px;
   margin: 0 auto;
   width: 98%;
-  overflow: scroll;
 }
 
 /* Stats Cards */
@@ -430,3 +429,111 @@ button {
 .offline { background: #95a5a6; }
 
 
+/* Admin Specific Styles */
+.flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.map-wrapper {
+    height: 400px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+}
+
+/* User Info Box in Table */
+.user-info-box {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    font-weight: 700;
+    color: #1a202c;
+    font-size: 14px;
+}
+
+.user-email {
+    font-size: 11px;
+    color: #718096;
+}
+
+/* Badge Pills */
+.badge-pill {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.badge-pill.present {
+    background: #c6f6d5;
+    color: #22543d;
+}
+
+.badge-pill.absent {
+    background: #fed7d7;
+    color: #822727;
+}
+
+/* Attendance Image Preview */
+.attendance-img {
+    width: 45px;
+    height: 45px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+
+.attendance-img:hover {
+    transform: scale(2.5);
+    position: relative;
+    z-index: 10;
+}
+
+.no-img {
+    font-size: 12px;
+    color: #cbd5e0;
+    font-style: italic;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid #4f46e5;
+    color: #4f46e5;
+    padding: 6px 15px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-outline:hover {
+    background: #f5f3ff;
+}
+
+/* Responsive Table Adjustment */
+@media (max-width: 600px) {
+    .modern-table thead { display: none; }
+    .modern-table td { 
+        display: block; 
+        text-align: right; 
+        border-bottom: 1px solid #edf2f7;
+        padding-left: 50%;
+        position: relative;
+    }
+    .modern-table td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 10px;
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 10px;
+    }
+}

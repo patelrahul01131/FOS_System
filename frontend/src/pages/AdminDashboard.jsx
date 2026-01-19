@@ -10,7 +10,6 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Calling the route we just updated in the Backend
     api.get("/admin/attendance") 
       .then(res => {
         setAttendance(res.data);
@@ -22,62 +21,102 @@ export default function AdminDashboard() {
       });
   }, []);
 
+  // Logic to calculate quick stats
+  const presentCount = attendance.filter(a => a.marked).length;
+  const totalUsers = attendance.length;
+
   return (
     <div className="layout">
       <Sidebar />
-      <div className="main">
-        <Topbar title="Admin Dashboard" />
+      <div className="main-content">
+        <Topbar title="Management Overview" />
 
-        <div className="card mt">
-          <h3>Live User Locations</h3>
-          <AdminLiveMap />
-        </div>
+        <div className="dashboard-container">
+          {/* Quick Stats Grid */}
+          <div className="stats-grid">
+            <div className="stat-card">
+              <span className="stat-label">Total Officers</span>
+              <div className="stat-value text-blue">{totalUsers}</div>
+            </div>
+            <div className="stat-card">
+              <span className="stat-label">Present Today</span>
+              <div className="stat-value text-green">{presentCount}</div>
+            </div>
+            <div className="stat-card">
+              <span className="stat-label">Attendance Rate</span>
+              <div className="stat-value">
+                {totalUsers > 0 ? Math.round((presentCount / totalUsers) * 100) : 0}%
+              </div>
+            </div>
+          </div>
 
-        <div className="card">
-          <h3>Today's Attendance Status</h3>
+          {/* Map Section */}
+          <div className="glass-card map-section">
+            <div className="card-header">
+              <h4>📍 Live Field Locations</h4>
+            </div>
+            <div className="map-wrapper mt">
+              <AdminLiveMap />
+            </div>
+          </div>
 
-          <table width="100%" style={{ marginTop: "15px" }} className="user-table">
-            <thead>
-              <tr>
-                <th>User</th>
-                <th>Status</th>
-                <th>Time</th>
-                <th>Image</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr><td colSpan="4">Loading...</td></tr>
-              ) : (
-                attendance.map((a) => (
-                  <tr key={a._id}>
-                    <td>
-                        <strong>{a.user?.name || "Unknown"}</strong><br/>
-                        <small>{a.user?.email}</small>
-                    </td>
-                    <td>
-                      {/* If marked is true, show Present, otherwise Absent */}
-                      {a.marked ? (
-                        <span className="badge green">Present ✅</span>
-                      ) : (
-                        <span className="badge red">Absent ❌</span>
-                      )}
-                    </td>
-                    <td>
-                        {a.marked ? new Date(a.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "--:--"}
-                    </td>
-                    <td>
-                      {a.image ? (
-                        <img src={a.image} width="50" height="50" style={{borderRadius: '5px', objectFit: 'cover'}} alt="Attendance" />
-                      ) : (
-                        <span style={{color: '#ccc'}}>No Image</span>
-                      )}
-                    </td>
+          {/* Attendance Table Section */}
+          <div className="glass-card mt">
+            <div className="card-header flex-between">
+              <h4>🕒 Today's Attendance Logs</h4>
+              <button className="btn-outline" onClick={() => window.location.reload()}>Refresh</button>
+            </div>
+
+            <div className="table-responsive">
+              <table className="modern-table mt">
+                <thead>
+                  <tr>
+                    <th>User Detail</th>
+                    <th>Status</th>
+                    <th>Check-in Time</th>
+                    <th>Verification</th>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                </thead>
+                <tbody>
+                  {loading ? (
+                    <tr><td colSpan="4" className="empty-state">Fetching logs...</td></tr>
+                  ) : attendance.length > 0 ? (
+                    attendance.map((a) => (
+                      <tr key={a._id}>
+                        <td className="user-cell">
+                          <div className="user-info-box">
+                            <span className="user-name">{a.user?.name || "Unknown"}</span>
+                            <span className="user-email">{a.user?.email}</span>
+                          </div>
+                        </td>
+                        <td>
+                          {a.marked ? (
+                            <span className="badge-pill present">Present</span>
+                          ) : (
+                            <span className="badge-pill absent">Absent</span>
+                          )}
+                        </td>
+                        <td className="time-cell">
+                          {a.marked ? new Date(a.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "--:--"}
+                        </td>
+                        <td>
+                          {a.image ? (
+                            <div className="img-container">
+                                <img src={a.image} className="attendance-img" alt="User face" />
+                            </div>
+                          ) : (
+                            <span className="no-img">No Image</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr><td colSpan="4" className="empty-state">No attendance records found.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </div>
