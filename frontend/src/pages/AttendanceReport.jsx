@@ -90,10 +90,10 @@ export default function AttendanceReport() {
                   onChange={(e) => setEndDate(e.target.value)}
                 />
               </div>
-              <div className="filter-actions">
+              {/* <div className="filter-actions">
                 <button className="btn-excel" onClick={() => exportData("excel")}>Excel</button>
                 <button className="btn-pdf" onClick={() => exportData("pdf")}>PDF</button>
-              </div>
+              </div> */}
             </div>
           </div>
 
