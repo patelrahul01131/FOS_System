@@ -537,3 +537,75 @@ button {
         font-size: 10px;
     }
 }
+
+/* Filter Bar Grid */
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  align-items: flex-end;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-group label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #4a5568;
+  margin-bottom: 5px;
+}
+
+.filter-group input {
+  padding: 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-excel, .btn-pdf {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  flex: 1;
+}
+
+.btn-excel { background: #107c10; } /* Excel Green */
+.btn-pdf { background: #e11d48; }   /* PDF Red */
+
+.text-btn {
+  background: none;
+  border: none;
+  color: #4f46e5;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.mb-20 { margin-bottom: 20px; }
+
+/* Table specific styling for report */
+.date-cell {
+  display: flex;
+  flex-direction: column;
+}
+
+.main-text { font-weight: 600; color: #1a202c; }
+.sub-text { font-size: 11px; color: #718096; }
+
+.loader-box {
+  padding: 40px;
+  text-align: center;
+  color: #4f46e5;
+  font-weight: 600;
+}
