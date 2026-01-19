@@ -35,7 +35,7 @@ export default function Login() {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <h2>FOS System</h2>
+          <h2>Satnam Sales</h2>
           <p>Sign in to your account</p>
         </div>
         

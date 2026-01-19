@@ -79,83 +79,79 @@ export default function UserDashboard() {
     }
   };
 
+// Keep all your imports and useEffect logic the same
+// In the return block, we wrap elements for better styling:
+
   return (
     <div className="layout">
       <Sidebar />
-      <div className="main">
-        <Topbar title="User Dashboard" />
-        <UserProfile /><br></br>
+      <div className="main-content">
+        <Topbar title="Field Officer Panel" />
         
-        <div className="cards">
-          <div className="card">
-            <h4>Status</h4>
-            <p className={status === "Online" ? "green" : "red"}>{status}</p>
-          </div>
-          <div className="card">
-            <h4>Last Location Update</h4>
-            <p>{lastUpdate}</p>
-          </div>
-        </div>
-
-        {/* Updated Expense Section */}
-        <div className="card mt">
-          {/* <h3>Add Expense</h3>
-          <div className="expense-inputs">
-            <select
-              value={expense.type}
-              onChange={e => setExpense({ ...expense, type: e.target.value })}
-            >
-              <option>Travel</option>
-              <option>Food</option>
-              <option>Tea</option>
-              <option>Other</option>
-            </select>
-            <input
-              type="number"
-              placeholder="Amount"
-              value={expense.amount}
-              onChange={e => setExpense({ ...expense, amount: e.target.value })}
-            />
-            <input
-              placeholder="Note"
-              value={expense.note}
-              onChange={e => setExpense({ ...expense, note: e.target.value })}
-            />
-            <button onClick={submitExpense}>Save Expense</button>
-          </div> */}
-
-          <hr className="mt" />
+        <div className="dashboard-container">
+          <section className="profile-section">
+            <UserProfile />
+          </section>
           
-          <h4 className="mt">Today's Expenses</h4>
-          <table width="100%" className="user-table mt">
-            <thead>
-              <tr>
-                <th>Type</th>
-                <th>Amount</th>
-                <th>Note</th>
-              </tr>
-            </thead>
-            <tbody>
-              {todayExpenses.length > 0 ? (
-                todayExpenses.map((exp) => (
-                  <tr key={exp._id}>
-                    <td>{exp.type}</td>
-                    <td>₹{exp.amount}</td>
-                    <td>{exp.note || "-"}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="3" style={{ textAlign: "center", color: "#888" }}>No expenses today</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+          <div className="stats-grid">
+            <div className="stat-card">
+              <span className="stat-label">System Status</span>
+              <div className="stat-value">
+                <span className={`status-dot ${status === "Online" ? "online" : "offline"}`}></span>
+                <span className={status === "Online" ? "text-green" : "text-red"}>{status}</span>
+              </div>
+            </div>
 
-        <div className="card mt">
-          <h3>Attendance (Face Scan)</h3>
-          <FaceAttendance />
+            <div className="stat-card">
+              <span className="stat-label">GPS Last Sync</span>
+              <div className="stat-value text-blue">{lastUpdate}</div>
+            </div>
+          </div>
+
+          <div className="content-grid">
+            {/* Expense Table Section */}
+            <div className="glass-card">
+              <div className="card-header">
+                <h4>Today's Expenses</h4>
+              </div>
+              <div className="table-responsive">
+                <table className="modern-table">
+                  <thead>
+                    <tr>
+                      <th>Type</th>
+                      <th>Amount</th>
+                      <th>Note</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {todayExpenses.length > 0 ? (
+                      todayExpenses.map((exp) => (
+                        <tr key={exp._id}>
+                          <td><span className={`type-tag ${exp.type.toLowerCase()}`}>{exp.type}</span></td>
+                          <td className="amount-cell">₹{exp.amount}</td>
+                          <td className="note-cell">{exp.note || "-"}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="3" className="empty-state">No entries yet today</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Attendance Section */}
+            <div className="glass-card">
+              <div className="card-header">
+                <h4>Face Attendance</h4>
+              </div>
+              <div className="attendance-wrapper">
+                <FaceAttendance />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

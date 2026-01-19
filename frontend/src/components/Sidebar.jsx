@@ -1,49 +1,48 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 export default function Sidebar() {
   const navigate = useNavigate();
-  
-  // 1. Get the role directly from LocalStorage (since Login.jsx saves it there)
+  const location = useLocation();
   const role = localStorage.getItem("role"); 
-  
-  // 2. Check if the string matches "admin"
   const isAdmin = role === "admin";
 
   const handleLogout = () => {
     localStorage.clear();
-    // Redirect to the correct login page based on who is logging out
     navigate(isAdmin ? "/admin" : "/user");
   };
 
+  const isActive = (path) => location.pathname === path ? "active" : "";
+
   return (
     <div className="sidebar">
-      <h2>Satnam Sales</h2>
+      <div className="sidebar-brand">
+        <h2>Satnam Sales</h2>
+        <span className="role-badge">{role}</span>
+      </div>
 
-      <nav>
-        {/* --- ADMIN LINKS --- */}
-        {isAdmin && (
+      <nav className="sidebar-nav">
+        {isAdmin ? (
           <>
-            <Link to="/admin/dashboard">Admin Dashboard</Link>
-            <Link to="/admin/report">Attendance Report</Link>
-            <Link to="/admin/users">Manage Users</Link>
-            <Link to="/admin/create-user">Add New User</Link>
-            <Link to="/admin/office-expenses">Office Expenses</Link>
-            <Link to="/admin/user-expenses">User Expenses List</Link>
+            <Link to="/admin/dashboard" className={isActive("/admin/dashboard")}>📊 Dashboard</Link>
+            <Link to="/admin/report" className={isActive("/admin/report")}>📝 Attendance</Link>
+            <Link to="/admin/users" className={isActive("/admin/users")}>👥 Manage Users</Link>
+            <Link to="/admin/create-user" className={isActive("/admin/create-user")}>➕ Add User</Link>
+            <Link to="/admin/office-expenses" className={isActive("/admin/office-expenses")}>🏢 Office Exp.</Link>
+            <Link to="/admin/user-expenses" className={isActive("/admin/user-expenses")}>💰 User Exp.</Link>
+          </>
+        ) : (
+          <>
+            <Link to="/user/dashboard" className={isActive("/user/dashboard")}>🏠 Dashboard</Link>
+            <Link to="/user/expenses" className={isActive("/user/expenses")}>💸 My Expenses</Link>
           </>
         )}
-
-        {/* --- USER LINKS --- */}
-        {role === "user" && (
-          <>
-            <Link to="/user/dashboard">User Dashboard</Link>
-            <Link to="/user/expenses">My Expenses</Link>
-          </>
-        )}
-
-        <button onClick={handleLogout} className="logout-btn">
-          Logout
-        </button>
       </nav>
+
+      <div className="sidebar-footer">
+        <button onClick={handleLogout} className="logout-btn">
+          🚪 Logout
+        </button>
+      </div>
     </div>
   );
 }
