@@ -18,8 +18,8 @@ const server = http.createServer(app);
 
 const dbURI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/fos";
 
-// app.use(cors());
-app.use(cors({ origin: "https://satnamsales.vercel.app" }));
+app.use(cors());
+// app.use(cors({ origin: "https://satnamsales.vercel.app" }));
 app.use(express.json());
 
 // mongoose.connect("mongodb://127.0.0.1:27017/fos");
@@ -43,6 +43,10 @@ app.use("/api/expenses", expenseRoutes);
 
 app.get("/api/users/test", (req, res) => {
     res.json({ message: "Route is reachable!" });
+});
+
+app.get("/", (req, res) => {
+  res.status(200).send("FOS Backend Server is Live and Running!");
 });
 
 initSocket(server);

@@ -7,19 +7,19 @@ await mongoose.connect("mongodb://127.0.0.1:27017/fos");
 // await User.deleteMany({});
 
 // const adminPassword = await bcrypt.hash("123456789", 10);
-// const userPassword = await bcrypt.hash("123456", 10);
+// const userPassword = await bcrypt.hash("123456789", 10);
 
 // await User.create([
 //   {
 //     name: "Admin",
-//     email: "admin@test.com",
+//     email: "admin@123.com",
 //     password: adminPassword,
 //     role: "admin",
 //     active: true
 //   },
 //   {
 //     name: "Rahul Patel",
-//     email: "user@test.com",
+//     email: "rahul@gmail.com",
 //     password: userPassword,
 //     role: "user",
 //     active: true,
