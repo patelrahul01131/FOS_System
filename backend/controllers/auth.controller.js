@@ -9,9 +9,8 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // 1. Find user AND explicitly include the password field
-    // The '+password' tells Mongoose to include the hidden field
-    const user = await User.findOne({ email: req.body.email }).select("+password");
+    // 1. Find user and include hidden password
+    const user = await User.findOne({ email }).select("+password");
 
     if (!user) {
       console.log("User not found in database:", email);
@@ -26,8 +25,24 @@ export const login = async (req, res) => {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    // ... generate token and send response ...
+    // 3. GENERATE TOKEN (This was missing!)
+    // Ensure the secret "FOS_SECRET" matches your auth.js middleware
+    const token = jwt.sign(
+      { id: user._id, role: user.role }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: "1d" }
+    );
+
+    // 4. SEND RESPONSE (This was missing!)
+    res.status(200).json({
+      token,
+      role: user.role,
+      name: user.name,
+      userId: user._id
+    });
+
   } catch (error) {
+    console.error("Login Controller Error:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
