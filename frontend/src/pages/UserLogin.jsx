@@ -1,31 +1,35 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../services/api"; // Use the central API instance
 import { connectSocket } from "../services/socket";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const login = async () => {
-    const { data } = await axios.post(
-      "http://localhost:5000/api/auth/login",
-      { email, password }
-    );
+    try {
+      // Points to Vercel/Render URL automatically
+      const { data } = await api.post("/auth/login", { email, password });
 
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("role", data.role);
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("role", data.role);
 
-    // 🔥 CONNECT SOCKET AFTER TOKEN IS SAVED
-    connectSocket();
+      connectSocket();
 
-    window.location.href = `/${data.role}/dashboard`;
+      window.location.href = `/${data.role}/dashboard`;
+    } catch (err) {
+      setError(err.response?.data?.message || "Login failed");
+    }
   };
 
   return (
-    <>
+    <div className="card">
+      <h2>Login</h2>
       <input placeholder="Email" onChange={e => setEmail(e.target.value)} />
       <input type="password" placeholder="Password" onChange={e => setPassword(e.target.value)} />
-      <button onClick={login}>Login</button>
-    </>
+      <button className="btn-primary" onClick={login}>Login</button>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+    </div>
   );
 }

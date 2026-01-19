@@ -18,7 +18,10 @@ export default function AttendanceReport() {
 
   const exportData = (type) => {
     // Points to your backend export routes
-    const url = `http://localhost:5000/api/admin/attendance/export/${type}`;
+  const baseURL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+  
+  const url = `${baseURL}/admin/attendance/export/${type}`;
+    // const url = `http://localhost:5000/api/admin/attendance/export/${type}`;
     window.open(url, "_blank");
   };
 
