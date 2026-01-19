@@ -18,8 +18,16 @@ const server = http.createServer(app);
 
 const dbURI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/fos";
 
+const corsOptions = {
+  origin: ["https://satnamsales.vercel.app", "http://localhost:5173"],
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true, // Required for cookies or authorization headers
+};
+
+app.use(cors(corsOptions));
+
 // app.use(cors());
-app.use(cors({ origin: "https://satnamsales.vercel.app" }));
+// app.use(cors({ origin: "https://satnamsales.vercel.app" }));
 app.use(express.json());
 
 // mongoose.connect("mongodb://127.0.0.1:27017/fos");

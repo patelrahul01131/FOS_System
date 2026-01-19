@@ -11,7 +11,7 @@ export const login = async (req, res) => {
 
     // 1. Find user AND explicitly include the password field
     // The '+password' tells Mongoose to include the hidden field
-    const user = await User.findOne({ email }).select("+password");
+    const user = await User.findOne({ email: req.body.email }).select("+password");
 
     if (!user) {
       console.log("User not found in database:", email);

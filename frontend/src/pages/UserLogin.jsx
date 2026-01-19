@@ -22,9 +22,11 @@ export default function Login() {
       connectSocket();
 
       window.location.href = `/${data.role}/dashboard`;
-    } catch (err) {
-      setError(err.response?.data?.message || "Login failed");
-    }
+    } catch (error) {
+    // This will print the EXACT error in your Render Logs
+    console.error("CRASH IN LOGIN CONTROLLER:", error.message); 
+    res.status(500).json({ message: error.message });
+  }
   };
 
   return (
