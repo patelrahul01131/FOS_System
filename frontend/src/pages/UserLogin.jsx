@@ -12,6 +12,10 @@ export default function Login() {
       // Points to Vercel/Render URL automatically
       const { data } = await api.post("/auth/login", { email, password });
 
+      console.log("Email received:", email);
+      // console.log("User found in DB:", !!user);
+      // if (user) console.log("Password field present in object:", !!user.password);
+
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.role);
 
