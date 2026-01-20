@@ -52,17 +52,8 @@ export default function AdminLiveMap() {
 
   return (
     <div style={{ height: "400px", width: "100%", borderRadius: "10px", overflow: "hidden" }}>
-      <MapContainer 
-        center={[20.5937, 78.9629]} 
-        zoom={5} 
-        style={{ height: "100%" }}
-        aria-hidden="false"
-      >
-        <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          crossOrigin={true}
-        />
+      <MapContainer center={[20.5937, 78.9629]} zoom={5} style={{ height: "100%" }}>
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
         {Object.values(users).map((u) => {
           const userColor = stringToColor(u.userId || "default");
