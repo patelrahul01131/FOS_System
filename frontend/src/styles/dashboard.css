@@ -634,7 +634,7 @@ button {
     color: #1a202c;
 }
 
-/* --- Base Sidebar Fixes --- */
+/* --- Sidebar Base --- */
 .sidebar {
   width: 260px;
   background: #1a1c23;
@@ -644,68 +644,76 @@ button {
   height: 100vh;
   position: sticky;
   top: 0;
-  z-index: 1000;
+  /* z-index must be higher than Leaflet's controls (1000) */
+  z-index: 2000; 
   transition: transform 0.3s ease-in-out;
 }
 
+/* --- Internal Navigation Layout --- */
 .sidebar-nav {
+  flex: 1; /* Pushes footer to the bottom */
   display: flex;
-  flex-direction: column; /* Forces vertical links */
-  padding: 20px 0;
+  flex-direction: column; 
+  padding: 10px 0;
+  overflow-y: auto; /* Allows scrolling if many links exist */
 }
 
-/* --- Mobile Specific Fixes (Max-Width: 768px) --- */
+.sidebar-footer {
+  padding: 20px;
+  border-top: 1px solid #2d2f39;
+}
+
+.logout-btn {
+  width: 100%;
+  padding: 12px;
+  background: #e11d48;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* --- Mobile Specific Fixes --- */
 @media (max-width: 768px) {
   .sidebar {
     position: fixed;
     left: 0;
     top: 0;
-    transform: translateX(-100%); /* Keeps it hidden off-screen */
-    width: 280px; /* Slightly wider for mobile readability */
-    box-shadow: 10px 0 15px rgba(0,0,0,0.3);
+    transform: translateX(-100%);
+    width: 280px;
+    /* Extra high z-index for mobile drawer */
+    z-index: 3000; 
   }
 
   .sidebar.open {
-    transform: translateX(0); /* Slides in */
+    transform: translateX(0);
   }
 
-  .sidebar-nav {
-    flex-direction: column; /* Ensures links don't horizontal scroll */
-    overflow-x: hidden;
-    overflow-y: auto;
+  /* Ensure map elements stay behind the sidebar overlay */
+  .leaflet-control-container {
+    z-index: 500 !important;
   }
 
-  .sidebar-nav a {
+  .close-btn {
     display: block;
-    width: 100%;
-    padding: 15px 25px; /* Bigger touch targets for mobile */
-    white-space: normal; /* Allows text to wrap if needed */
-  }
-
-  .sidebar-brand {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 40px 20px 20px;
-    position: relative;
-  }
-
-  .close-sidebar-btn {
-    position: absolute;
-    top: 10px;
-    right: 15px;
     background: none;
     border: none;
     color: white;
-    font-size: 20px;
+    font-size: 24px;
+    position: absolute;
+    top: 15px;
+    right: 15px;
     cursor: pointer;
   }
+}
 
-  .hamburger {
-    display: block;
-    position: fixed;
-    top: 15px;
-    left: 15px;
-    z-index: 999; /* Below the sidebar but above main content */
-  }
+/* Overlay to block map interaction when sidebar is open */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2500;
 }

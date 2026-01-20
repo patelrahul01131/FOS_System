@@ -20,6 +20,7 @@ export default function Sidebar() {
 
   return (
     <>
+      {/* Fixed Hamburger Position */}
       <button className="hamburger" onClick={toggleSidebar}>
         {isOpen ? "✕" : "☰"}
       </button>
@@ -28,7 +29,7 @@ export default function Sidebar() {
 
       <div className={`sidebar ${isOpen ? "open" : ""}`}>
         <div className="sidebar-brand">
-          <button className="close-sidebar-btn" onClick={closeSidebar}>✕</button>
+          <button className="close-btn" onClick={closeSidebar}>✕</button>
           <h2>Satnam Sales</h2>
           <span className="role-badge">{role}</span>
         </div>
@@ -52,6 +53,7 @@ export default function Sidebar() {
           )}
         </nav>
 
+        {/* Footer wrapper for Logout button */}
         <div className="sidebar-footer">
           <button onClick={handleLogout} className="logout-btn">
             🚪 Logout
