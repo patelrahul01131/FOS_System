@@ -11,14 +11,9 @@ export default function UserDashboard() {
   const [status, setStatus] = useState("Offline");
   const [lastUpdate, setLastUpdate] = useState("--");
   const [user, setUser] = useState(null);
-  const [todayExpenses, setTodayExpenses] = useState([]); // State for today's list
-  const [expense, setExpense] = useState({
-    type: "Travel",
-    amount: "",
-    note: ""
-  });
+  const [todayExpenses, setTodayExpenses] = useState([]);
+  const [expense, setExpense] = useState({ type: "Travel", amount: "", note: "" });
 
-  // Fetch user profile and today's expenses
   useEffect(() => {
     api.get("/users/me")
       .then(res => setUser(res.data))
@@ -36,51 +31,41 @@ export default function UserDashboard() {
     }
   };
 
+  // --- BACKGROUND TRACKING LOGIC ---
   useEffect(() => {
     const socket = connectSocket();
-    if (!socket) return;
+    if (!socket || !user) return;
+
     setStatus("Online");
 
-    const sendLocation = () => {
-      if (user && navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          pos => {
-            socket.emit("sendLocation", {
-              userId: user._id,
-              name: user.name,
-              lat: pos.coords.latitude,
-              lng: pos.coords.longitude
-            });
-            setLastUpdate(new Date().toLocaleTimeString());
-          },
-          err => console.error("Location error", err),
-          { enableHighAccuracy: true }
-        );
-      }
+    // Options to force the GPS to stay active
+    const geoOptions = {
+      enableHighAccuracy: true, // Uses GPS hardware, not just Wi-Fi
+      maximumAge: 0,            // Do not use cached locations
+      timeout: 10000            // Wait up to 10s for a fix
     };
 
-    sendLocation();
-    const interval = setInterval(sendLocation, 10000);
+    // Use watchPosition instead of an interval for background support
+    const watchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        socket.emit("sendLocation", {
+          userId: user._id,
+          name: user.name,
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude
+        });
+        setLastUpdate(new Date().toLocaleTimeString());
+      },
+      (err) => console.error("GPS Watch Error:", err),
+      geoOptions
+    );
+
+    // Cleanup: Stop the GPS hardware when user logs out/closes dashboard
     return () => {
-      clearInterval(interval);
+      navigator.geolocation.clearWatch(watchId);
       setStatus("Offline");
     };
   }, [user]);
-
-  const submitExpense = async () => {
-    if (!expense.amount) return alert("Enter amount");
-    try {
-      await api.post("/expenses", expense);
-      alert("Expense added");
-      setExpense({ type: "Travel", amount: "", note: "" });
-      fetchTodayExpenses(); // Refresh the today's list immediately
-    } catch (err) {
-      alert("Failed to add expense");
-    }
-  };
-
-// Keep all your imports and useEffect logic the same
-// In the return block, we wrap elements for better styling:
 
   return (
     <div className="layout">
@@ -91,7 +76,7 @@ export default function UserDashboard() {
         <div className="dashboard-container">
           <section className="profile-section">
             <UserProfile />
-          </section><br></br>
+          </section><br />
           
           <div className="stats-grid">
             <div className="stat-card">
@@ -103,13 +88,12 @@ export default function UserDashboard() {
             </div>
 
             <div className="stat-card">
-              <span className="stat-label">GPS Last Sync</span>
+              <span className="stat-label">GPS Live Tracker</span>
               <div className="stat-value text-blue">{lastUpdate}</div>
             </div>
           </div>
 
           <div className="content-grid">
-            {/* Expense Table Section */}
             <div className="glass-card">
               <div className="card-header">
                 <h4>Today's Expenses</h4>
@@ -142,7 +126,6 @@ export default function UserDashboard() {
               </div>
             </div>
 
-            {/* Attendance Section */}
             <div className="glass-card">
               <div className="card-header">
                 <h4>Face Attendance</h4>
