@@ -4,6 +4,8 @@ import api from "../services/api";
 export default function ExpenseReport({ category }) {
   const [expenses, setExpenses] = useState([]);
   const [users, setUsers] = useState([]);
+  const [editingId, setEditingId] = useState(null); // Tracks which row is being edited
+  const [editForm, setEditForm] = useState({ type: "", amount: "", note: "" });
   const [filters, setFilters] = useState({
     userId: "", 
     type: "", 
@@ -13,7 +15,6 @@ export default function ExpenseReport({ category }) {
   });
 
   useEffect(() => {
-    // Fetch users for the dropdown (only if it's the user category)
     if (category === "user") {
       api.get("/admin/users").then(res => setUsers(res.data.filter(u => u.role === "user")));
     }
@@ -22,20 +23,43 @@ export default function ExpenseReport({ category }) {
 
   const fetchData = async () => {
     try {
-        // If your api base URL is http://localhost:5000/api
-        // This call targets: http://localhost:5000/api/expenses/report
-        const res = await api.get("/expenses/report", { 
+      const res = await api.get("/expenses/report", { 
         params: { ...filters, category } 
-        });
-        setExpenses(res.data);
+      });
+      setExpenses(res.data);
     } catch (err) {
-        console.error("Error fetching expenses", err);
-        // If you still get a 404, try: api.get("/expenses/expenses/report") 
-        // to see if your backend router is repeating the name.
+      console.error("Error fetching expenses", err);
     }
-    };
+  };
 
-  // Calculate total dynamically (React re-calculates this whenever 'expenses' changes)
+  // DELETE LOGIC
+  const handleDelete = async (id) => {
+    if (!window.confirm("Admin: Are you sure you want to delete this expense record?")) return;
+    try {
+      await api.delete(`/expenses/${id}`);
+      fetchData(); // Refresh list
+    } catch (err) {
+      alert("Delete failed");
+    }
+  };
+
+  // EDIT LOGIC (START)
+  const startEdit = (exp) => {
+    setEditingId(exp._id);
+    setEditForm({ type: exp.type, amount: exp.amount, note: exp.note });
+  };
+
+  // EDIT LOGIC (SAVE)
+  const handleUpdate = async (id) => {
+    try {
+      await api.put(`/expenses/${id}`, editForm);
+      setEditingId(null);
+      fetchData();
+    } catch (err) {
+      alert("Update failed");
+    }
+  };
+
   const totalAmount = expenses.reduce((sum, exp) => sum + Number(exp.amount || 0), 0);
 
   return (
@@ -71,9 +95,10 @@ export default function ExpenseReport({ category }) {
           <tr>
             <th>Date</th>
             {category === "user" && <th>User Name</th>}
-            <th>Expense Type</th>
+            <th>Type</th>
             <th>Note</th>
             <th style={{ textAlign: "right" }}>Amount</th>
+            <th style={{ textAlign: "center" }}>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -82,29 +107,57 @@ export default function ExpenseReport({ category }) {
               <tr key={exp._id}>
                 <td>{new Date(exp.date).toLocaleDateString()}</td>
                 {category === "user" && <td>{exp.user?.name || "Unknown"}</td>}
-                <td>{exp.type}</td>
-                <td>{exp.note || "-"}</td>
-                <td style={{ textAlign: "right" }}>₹{exp.amount}</td>
+                
+                {/* EDITABLE FIELDS */}
+                {editingId === exp._id ? (
+                  <>
+                    <td>
+                      <select value={editForm.type} onChange={e => setEditForm({...editForm, type: e.target.value})}>
+                        <option>Travel</option><option>Food</option><option>Tea</option><option>Other</option>
+                      </select>
+                    </td>
+                    <td>
+                      <input type="text" value={editForm.note} onChange={e => setEditForm({...editForm, note: e.target.value})} />
+                    </td>
+                    <td style={{ textAlign: "right" }}>
+                      <input type="number" style={{ width: '80px' }} value={editForm.amount} onChange={e => setEditForm({...editForm, amount: e.target.value})} />
+                    </td>
+                    <td style={{ textAlign: "center" }}>
+                      <button onClick={() => handleUpdate(exp._id)} style={{ color: 'green', cursor: 'pointer', marginRight: '10px' }}>Save</button>
+                      <button onClick={() => setEditingId(null)} style={{ color: 'gray', cursor: 'pointer' }}>Cancel</button>
+                    </td>
+                  </>
+                ) : (
+                  <>
+                    <td>{exp.type}</td>
+                    <td>{exp.note || "-"}</td>
+                    <td style={{ textAlign: "right" }}>₹{exp.amount}</td>
+                    <td style={{ textAlign: "center" }}>
+                      <button onClick={() => startEdit(exp)} style={{ border: 'none', background: 'none', color: '#3498db', cursor: 'pointer', marginRight: '10px' }}>Edit</button>
+                      <button onClick={() => handleDelete(exp._id)} style={{ border: 'none', background: 'none', color: '#e74c3c', cursor: 'pointer' }}>Delete</button>
+                    </td>
+                  </>
+                )}
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan={category === "user" ? 5 : 4} style={{ textAlign: "center", padding: "20px" }}>
-                No records found for the selected filters.
+              <td colSpan={category === "user" ? 6 : 5} style={{ textAlign: "center", padding: "20px" }}>
+                No records found.
               </td>
             </tr>
           )}
         </tbody>
         
-        {/* FOOTER SHOWING TOTAL */}
         <tfoot>
           <tr style={{ backgroundColor: "#f8f9fa", fontWeight: "bold", borderTop: "2px solid #dee2e6" }}>
             <td colSpan={category === "user" ? 4 : 3} style={{ textAlign: "right", padding: "12px" }}>
               Total Amount:
             </td>
-            <td style={{ textAlign: "right", padding: "12px", color: "#2ecc71", fontSize: "1.1rem" }}>
+            <td style={{ textAlign: "right", padding: "12px", color: "#2ecc71" }}>
               ₹{totalAmount.toLocaleString('en-IN')}
             </td>
+            <td></td>
           </tr>
         </tfoot>
       </table>
