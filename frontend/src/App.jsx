@@ -10,6 +10,7 @@ import AttendanceReport from "./pages/AttendanceReport";
 import MyExpenses from "./pages/MyExpenses";
 import OfficeExpenses from "./pages/OfficeExpenses";
 import UserExpenses from "./pages/UserExpenses";
+import UserHistory from "./pages/UserHistory";
 
 export default function App() {
   return (
@@ -28,6 +29,14 @@ export default function App() {
           element={
             <ProtectedRoute role="admin">
               <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/history"
+          element={
+            <ProtectedRoute role="admin">
+              <UserHistory />
             </ProtectedRoute>
           }
         />

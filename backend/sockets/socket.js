@@ -21,30 +21,37 @@ export default function init(server) {
     User.findByIdAndUpdate(socket.user.id, { online: true }).exec();
 
     socket.on("sendLocation", async (data) => {
-      // Prepare location object
-      const loc = {
-        lat: data.lat,
-        lng: data.lng,
-        userId: socket.user.id
-      };
+      try {
+        // Fetch verified name from DB
+        const dbUser = await User.findById(socket.user.id);
+        const userName = dbUser ? dbUser.name : "Unknown User";
 
-      // Save to LiveLocation (Latest)
-      await LiveLocation.findOneAndUpdate(
-        { userId: socket.user.id },
-        loc,
-        { upsert: true }
-      );
+        const loc = {
+          lat: data.lat,
+          lng: data.lng,
+          userId: socket.user.id
+        };
 
-      // Save to LocationHistory (Logs)
-      await LocationHistory.create(loc);
+        // Save to LiveLocation (Latest)
+        await LiveLocation.findOneAndUpdate(
+          { userId: socket.user.id },
+          loc,
+          { upsert: true }
+        );
 
-      // Emit to Admin with User Name
-      io.emit("adminLiveLocation", { 
-        userId: socket.user.id, 
-        name: data.name, // Relaying the name received from user
-        lat: data.lat, 
-        lng: data.lng 
-      });
+        // Save to LocationHistory (Logs for path history)
+        await LocationHistory.create(loc);
+
+        // Emit to Admin with VERIFIED User Name
+        io.emit("adminLiveLocation", { 
+          userId: socket.user.id, 
+          name: userName, 
+          lat: data.lat, 
+          lng: data.lng 
+        });
+      } catch (err) {
+        console.error("Socket error:", err);
+      }
     });
 
     socket.on("disconnect", () => {

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom"; // Added Link
 import Sidebar from "../components/Sidebar";
 import Topbar from "../components/Topbar";
 import api from "../services/api";
@@ -21,7 +22,6 @@ export default function AdminDashboard() {
       });
   }, []);
 
-  // Logic to calculate quick stats
   const presentCount = attendance.filter(a => a.marked).length;
   const totalUsers = attendance.length;
 
@@ -32,7 +32,6 @@ export default function AdminDashboard() {
         <Topbar title="Management Overview" />
 
         <div className="dashboard-container">
-          {/* Quick Stats Grid */}
           <div className="stats-grid">
             <div className="stat-card">
               <span className="stat-label">Total Officers</span>
@@ -50,7 +49,6 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          {/* Map Section */}
           <div className="glass-card map-section">
             <div className="card-header">
               <h4>📍 Live Field Locations</h4>
@@ -60,7 +58,6 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          {/* Attendance Table Section */}
           <div className="glass-card mt">
             <div className="card-header flex-between">
               <h4>🕒 Today's Attendance Logs</h4>
@@ -85,7 +82,10 @@ export default function AdminDashboard() {
                       <tr key={a._id}>
                         <td className="user-cell">
                           <div className="user-info-box">
-                            <span className="user-name">{a.user?.name || "Unknown"}</span>
+                            {/* Made the name clickable to navigate to History */}
+                            <Link to={`/admin/history?userId=${a._id}`} className="user-name" style={{ color: "#4f46e5", fontWeight: "bold" }}>
+                              {a.user?.name || "Unknown"}
+                            </Link>
                             <span className="user-email">{a.user?.email}</span>
                           </div>
                         </td>

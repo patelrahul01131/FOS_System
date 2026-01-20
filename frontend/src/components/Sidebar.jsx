@@ -29,6 +29,7 @@ export default function Sidebar() {
             <Link to="/admin/create-user" className={isActive("/admin/create-user")}>➕ Add User</Link>
             <Link to="/admin/office-expenses" className={isActive("/admin/office-expenses")}>🏢 Office Exp.</Link>
             <Link to="/admin/user-expenses" className={isActive("/admin/user-expenses")}>💰 User Exp.</Link>
+            <Link to="/admin/history">📍 Route History</Link>
           </>
         ) : (
           <>
