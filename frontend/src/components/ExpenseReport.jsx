@@ -32,31 +32,28 @@ export default function ExpenseReport({ category }) {
     }
   };
 
-  // DELETE LOGIC
   const handleDelete = async (id) => {
     if (!window.confirm("Admin: Are you sure you want to delete this expense record?")) return;
     try {
       await api.delete(`/expenses/${id}`);
-      fetchData(); // Refresh list
+      fetchData(); 
     } catch (err) {
       alert("Delete failed");
     }
   };
 
-  // EDIT LOGIC (START)
   const startEdit = (exp) => {
     setEditingId(exp._id);
     setEditForm({ type: exp.type, amount: exp.amount, note: exp.note });
   };
 
-  // EDIT LOGIC (SAVE)
   const handleUpdate = async (id) => {
     try {
       await api.put(`/expenses/${id}`, editForm);
       setEditingId(null);
       fetchData();
     } catch (err) {
-      alert("Update failed");
+      alert("Update failed - Only Admin or Owner can modify this");
     }
   };
 
@@ -108,23 +105,46 @@ export default function ExpenseReport({ category }) {
                 <td>{new Date(exp.date).toLocaleDateString()}</td>
                 {category === "user" && <td>{exp.user?.name || "Unknown"}</td>}
                 
-                {/* EDITABLE FIELDS */}
                 {editingId === exp._id ? (
                   <>
                     <td>
-                      <select value={editForm.type} onChange={e => setEditForm({...editForm, type: e.target.value})}>
+                      <select 
+                        value={editForm.type} 
+                        onChange={e => setEditForm({...editForm, type: e.target.value})}
+                        style={{ padding: '4px', borderRadius: '4px' }}
+                      >
                         <option>Travel</option><option>Food</option><option>Tea</option><option>Other</option>
                       </select>
                     </td>
                     <td>
-                      <input type="text" value={editForm.note} onChange={e => setEditForm({...editForm, note: e.target.value})} />
+                      <input 
+                        type="text" 
+                        value={editForm.note} 
+                        onChange={e => setEditForm({...editForm, note: e.target.value})} 
+                        style={{ padding: '4px', borderRadius: '4px', width: '90%' }}
+                      />
                     </td>
                     <td style={{ textAlign: "right" }}>
-                      <input type="number" style={{ width: '80px' }} value={editForm.amount} onChange={e => setEditForm({...editForm, amount: e.target.value})} />
+                      <input 
+                        type="number" 
+                        style={{ width: '80px', padding: '4px', borderRadius: '4px' }} 
+                        value={editForm.amount} 
+                        onChange={e => setEditForm({...editForm, amount: e.target.value})} 
+                      />
                     </td>
                     <td style={{ textAlign: "center" }}>
-                      <button onClick={() => handleUpdate(exp._id)} style={{ color: 'green', cursor: 'pointer', marginRight: '10px' }}>Save</button>
-                      <button onClick={() => setEditingId(null)} style={{ color: 'gray', cursor: 'pointer' }}>Cancel</button>
+                      <button 
+                        onClick={() => handleUpdate(exp._id)} 
+                        style={{ backgroundColor: '#2ecc71', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', marginRight: '5px' }}
+                      >
+                        Save
+                      </button>
+                      <button 
+                        onClick={() => setEditingId(null)} 
+                        style={{ backgroundColor: '#95a5a6', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer' }}
+                      >
+                        Cancel
+                      </button>
                     </td>
                   </>
                 ) : (
@@ -133,8 +153,18 @@ export default function ExpenseReport({ category }) {
                     <td>{exp.note || "-"}</td>
                     <td style={{ textAlign: "right" }}>₹{exp.amount}</td>
                     <td style={{ textAlign: "center" }}>
-                      <button onClick={() => startEdit(exp)} style={{ border: 'none', background: 'none', color: '#3498db', cursor: 'pointer', marginRight: '10px' }}>Edit</button>
-                      <button onClick={() => handleDelete(exp._id)} style={{ border: 'none', background: 'none', color: '#e74c3c', cursor: 'pointer' }}>Delete</button>
+                      <button 
+                        onClick={() => startEdit(exp)} 
+                        style={{ backgroundColor: '#3498db', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', marginRight: '5px' }}
+                      >
+                        Edit
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(exp._id)} 
+                        style={{ backgroundColor: '#e74c3c', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer' }}
+                      >
+                        Delete
+                      </button>
                     </td>
                   </>
                 )}

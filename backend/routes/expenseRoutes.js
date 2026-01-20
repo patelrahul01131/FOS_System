@@ -99,7 +99,7 @@ router.post("/", auth, async (req, res) => {
   }
 });
 
-// 5. PUT: Update an existing expense (Added for Modify feature)
+// 5. PUT: Update an existing expense (Updated to allow Admin access)
 router.put("/:id", auth, async (req, res) => {
   try {
     const { type, amount, note } = req.body;
@@ -107,9 +107,12 @@ router.put("/:id", auth, async (req, res) => {
 
     if (!expense) return res.status(404).json({ message: "Expense not found" });
 
-    // Check ownership
-    if (expense.user && expense.user.toString() !== req.user.id) {
-      return res.status(401).json({ message: "User not authorized" });
+    // Authorization: Allow if the user is the owner OR is an admin
+    const isOwner = expense.user && expense.user.toString() === req.user.id;
+    const isAdminUser = req.user.role === 'admin';
+
+    if (!isOwner && !isAdminUser) {
+      return res.status(401).json({ message: "User not authorized to modify this record" });
     }
 
     expense.type = type || expense.type;
@@ -124,16 +127,19 @@ router.put("/:id", auth, async (req, res) => {
   }
 });
 
-// 6. DELETE: Remove an expense (Added for Delete feature)
+// 6. DELETE: Remove an expense (Updated to allow Admin access)
 router.delete("/:id", auth, async (req, res) => {
   try {
     const expense = await Expense.findById(req.params.id);
 
     if (!expense) return res.status(404).json({ message: "Expense not found" });
 
-    // Check ownership
-    if (expense.user && expense.user.toString() !== req.user.id) {
-      return res.status(401).json({ message: "User not authorized" });
+    // Authorization: Allow if the user is the owner OR is an admin
+    const isOwner = expense.user && expense.user.toString() === req.user.id;
+    const isAdminUser = req.user.role === 'admin';
+
+    if (!isOwner && !isAdminUser) {
+      return res.status(401).json({ message: "User not authorized to delete this record" });
     }
 
     await expense.deleteOne();
