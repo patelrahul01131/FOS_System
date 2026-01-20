@@ -717,3 +717,41 @@ button {
   background: rgba(0, 0, 0, 0.5);
   z-index: 2500;
 }
+
+/* Prevent map from overlapping content */
+.glass-card {
+  position: relative;
+  z-index: 1; /* Keep content above map attribution */
+}
+
+/* Horizontal scrolling for table on mobile */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-top: 15px;
+  border-radius: 8px;
+}
+
+/* Long note handling */
+.note-cell {
+  max-width: 200px;
+  white-space: normal;
+  word-wrap: break-word;
+  font-size: 12px;
+}
+
+/* Input styling during edit mode */
+.edit-input {
+  padding: 6px;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  width: 100%;
+}
+
+/* Empty state styling */
+.empty-state {
+  text-align: center;
+  padding: 40px !important;
+  color: #a0aec0;
+}
