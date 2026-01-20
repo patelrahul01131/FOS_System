@@ -51,9 +51,18 @@ export default function AdminLiveMap() {
   }, []);
 
   return (
-    <div style={{ height: "400px", width: "100%", borderRadius: "10px", overflow: "hidden" }}>
-      <MapContainer center={[20.5937, 78.9629]} zoom={5} style={{ height: "100%" }}>
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+    <div style={{ height: "400px", width: "100%", borderRadius: "10px", overflow: "hidden", border: "1px solid #ddd" }}>
+      <MapContainer 
+        center={[20.5937, 78.9629]} 
+        zoom={5} 
+        style={{ height: "100%" }}
+      >
+        {/* Switched to Esri World Topo for street names, area labels, and building footprints */}
+        <TileLayer 
+          url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}" 
+          attribution='Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
+          crossOrigin={true}
+        />
 
         {Object.values(users).map((u) => {
           const userColor = stringToColor(u.userId || "default");
@@ -62,7 +71,7 @@ export default function AdminLiveMap() {
             <Marker 
               key={u.userId} 
               position={[u.lat, u.lng]} 
-              icon={createColoredIcon(userColor)} // Applying custom colored icon
+              icon={createColoredIcon(userColor)}
             >
               <Tooltip permanent direction="top" offset={[0, -40]}>
                 <span style={{ color: userColor, fontWeight: "bold" }}>
@@ -74,8 +83,18 @@ export default function AdminLiveMap() {
                 <div style={{ textAlign: "center" }}>
                   <strong style={{ color: userColor }}>{u.name}</strong> <br />
                   <span style={{ fontSize: "12px", color: "#666" }}>
-                    Last Update: {new Date().toLocaleTimeString()}
+                    Status: <span style={{ color: "green", fontWeight: "bold" }}>Live Now</span><br />
+                    Updated: {new Date().toLocaleTimeString()}
                   </span>
+                  <hr style={{ margin: "8px 0", border: "0", borderTop: "1px solid #eee" }} />
+                  <a 
+                    href={`https://www.google.com/maps?q=${u.lat},${u.lng}`} 
+                    target="_blank" 
+                    rel="noreferrer"
+                    style={{ fontSize: "11px", color: "#4f46e5", textDecoration: "none", fontWeight: "bold" }}
+                  >
+                    View in Google Maps ↗
+                  </a>
                 </div>
               </Popup>
             </Marker>
