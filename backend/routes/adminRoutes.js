@@ -48,6 +48,34 @@ router.get("/users", auth, isAdmin, async (req, res) => {
   }
 });
 
+// UPDATE USER (Necessary for Edit Button)
+router.put("/users/:id", auth, isAdmin, async (req, res) => {
+  try {
+    const { name, email, bankAccount, address } = req.body;
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      { name, email, bankAccount, address },
+      { new: true }
+    ).select("-password");
+    
+    if (!updatedUser) return res.status(404).json({ message: "User not found" });
+    res.json(updatedUser);
+  } catch (err) {
+    res.status(500).json({ message: "Error updating user" });
+  }
+});
+
+// DELETE USER (Necessary for Delete Button)
+router.delete("/users/:id", auth, isAdmin, async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json({ message: "User deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Error deleting user" });
+  }
+});
+
 // GET LOCATION HISTORY
 router.get("/location-history/:userId", auth, isAdmin, async (req, res) => {
   try {

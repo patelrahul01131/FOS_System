@@ -5,18 +5,17 @@ import Expense from "../models/Expense.js";
 
 const router = express.Router();
 
-// 1. User: Get their own past expenses
+// 1. Get own expenses
 router.get("/my-expenses", auth, async (req, res) => {
   try {
     const expenses = await Expense.find({ user: req.user.id }).sort({ date: -1 });
     res.json(expenses);
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Server Error" });
   }
 });
 
-// 2. Admin: Get filtered reports
+// 2. Admin Report
 router.get("/report", auth, isAdmin, async (req, res) => {
   try {
     const { userId, type, range, startDate, endDate, category } = req.query;
@@ -55,12 +54,11 @@ router.get("/report", auth, isAdmin, async (req, res) => {
 
     res.json(expenses);
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Error fetching report" });
   }
 });
 
-// 3. User: Get today's expenses for dashboard
+// 3. Today's Dashboard List
 router.get("/today", auth, async (req, res) => {
   try {
     const startOfDay = new Date();
@@ -79,7 +77,7 @@ router.get("/today", auth, async (req, res) => {
   }
 });
 
-// 4. POST: Add new expense
+// 4. Add Expense
 router.post("/", auth, async (req, res) => {
   try {
     const { type, amount, note } = req.body;
@@ -94,12 +92,11 @@ router.post("/", auth, async (req, res) => {
     await newExpense.save();
     res.status(201).json({ message: "Expense added successfully", expense: newExpense });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Server Error" });
   }
 });
 
-// 5. PUT: Update an existing expense (Updated to allow Admin access)
+// 5. Update Expense (Admin or Owner)
 router.put("/:id", auth, async (req, res) => {
   try {
     const { type, amount, note } = req.body;
@@ -107,7 +104,6 @@ router.put("/:id", auth, async (req, res) => {
 
     if (!expense) return res.status(404).json({ message: "Expense not found" });
 
-    // Authorization: Allow if the user is the owner OR is an admin
     const isOwner = expense.user && expense.user.toString() === req.user.id;
     const isAdminUser = req.user.role === 'admin';
 
@@ -122,19 +118,16 @@ router.put("/:id", auth, async (req, res) => {
     await expense.save();
     res.json(expense);
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Server Error" });
   }
 });
 
-// 6. DELETE: Remove an expense (Updated to allow Admin access)
+// 6. Delete Expense (Admin or Owner)
 router.delete("/:id", auth, async (req, res) => {
   try {
     const expense = await Expense.findById(req.params.id);
-
     if (!expense) return res.status(404).json({ message: "Expense not found" });
 
-    // Authorization: Allow if the user is the owner OR is an admin
     const isOwner = expense.user && expense.user.toString() === req.user.id;
     const isAdminUser = req.user.role === 'admin';
 
@@ -145,7 +138,6 @@ router.delete("/:id", auth, async (req, res) => {
     await expense.deleteOne();
     res.json({ message: "Expense removed" });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Server Error" });
   }
 });
