@@ -53,7 +53,11 @@ export default function AdminLiveMap() {
   return (
     <div style={{ height: "400px", width: "100%", borderRadius: "10px", overflow: "hidden" }}>
       <MapContainer center={[20.5937, 78.9629]} zoom={5} style={{ height: "100%" }}>
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        <TileLayer 
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" 
+          attribution='&copy; OpenStreetMap contributors'
+          crossOrigin={true} // IMPORTANT for Apps
+        />
 
         {Object.values(users).map((u) => {
           const userColor = stringToColor(u.userId || "default");
