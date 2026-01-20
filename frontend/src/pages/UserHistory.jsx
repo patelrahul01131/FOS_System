@@ -6,7 +6,7 @@ import api from "../services/api";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// --- Helper Functions (Same as AdminLiveMap) ---
+// --- Helper Functions ---
 
 const stringToColor = (str) => {
   let hash = 0;
@@ -42,7 +42,6 @@ export default function UserHistory() {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Load user list for dropdown
   useEffect(() => {
     api.get("/admin/users").then(res => setUsers(res.data));
   }, []);
@@ -51,12 +50,11 @@ export default function UserHistory() {
     if (!selectedUser) return alert("Please select a user");
     setLoading(true);
     try {
-      // Corrected API endpoint to match your adminRoutes.js
       const res = await api.get(`/admin/location-history/${selectedUser}?date=${selectedDate}`);
       setHistory(res.data);
     } catch (err) {
       console.error("Error fetching history", err);
-      alert("Failed to fetch history. Check if the backend route is active.");
+      alert("Failed to fetch history.");
     } finally {
       setLoading(false);
     }
@@ -72,7 +70,6 @@ export default function UserHistory() {
         <Topbar title="Route History" />
         <div className="dashboard-container">
           
-          {/* Filter Bar */}
           <div className="glass-card mb-20">
             <div className="filter-grid">
               <div className="filter-group">
@@ -96,43 +93,61 @@ export default function UserHistory() {
             </div>
           </div>
 
-          {/* Map Section */}
-          <div className="glass-card" style={{ height: "550px", overflow: "hidden" }}>
+          <div className="glass-card" style={{ height: "600px", overflow: "hidden" }}>
             {history.length > 0 ? (
               <MapContainer 
-                center={path[0]} 
-                zoom={14} 
+                center={path[path.length - 1]} // Center on last position
+                zoom={16} // High zoom for street details
                 style={{ height: "100%", width: "100%" }}
               >
-                {/* Same high-performance tiles as Live Map */}
+                {/* ESRI World Topo provides extreme street-level detail and local area names */}
                 <TileLayer 
-                  url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" 
+                  url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}" 
+                  attribution='Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
                   crossOrigin={true}
                 />
 
-                {/* The Travel Path Line */}
-                <Polyline positions={path} color={userColor} weight={4} opacity={0.6} dashArray="10, 10" />
+                {/* Path line - thicker for visibility on detailed maps */}
+                <Polyline positions={path} color={userColor} weight={6} opacity={0.7} />
 
-                {/* Start Point Marker (Green) */}
+                {/* Start Point */}
                 <Marker position={path[0]} icon={createColoredIcon("#10b981")}>
-                  <Popup><b>Start Point</b><br/>{new Date(history[0].createdAt).toLocaleTimeString()}</Popup>
-                  <Tooltip permanent direction="top" offset={[0, -40]}>Check-in</Tooltip>
+                  <Popup>
+                    <strong>Start Point (Check-in)</strong><br/>
+                    Time: {new Date(history[0].createdAt).toLocaleTimeString()}
+                  </Popup>
+                  <Tooltip direction="top" offset={[0, -40]}>Start</Tooltip>
                 </Marker>
 
-                {/* Current/End Point Marker (User's Theme Color) */}
-                <Marker position={path[path.length - 1]} icon={createColoredIcon(userColor)}>
+                {/* Midpoints (shown every 15 points to avoid clutter but show progress) */}
+                {history.map((point, index) => {
+                  if (index > 0 && index < history.length - 1 && index % 15 === 0) {
+                    return (
+                      <Marker key={index} position={[point.lat, point.lng]} icon={createColoredIcon(userColor)}>
+                        <Popup>
+                          <strong>Waypoint</strong><br/>
+                          Time: {new Date(point.createdAt).toLocaleTimeString()}
+                        </Popup>
+                      </Marker>
+                    );
+                  }
+                  return null;
+                })}
+
+                {/* Final Point */}
+                <Marker position={path[path.length - 1]} icon={createColoredIcon("#ef4444")}>
                   <Popup>
-                    <b>Last Position</b><br/>
+                    <strong>Last Known Position</strong><br/>
                     Time: {new Date(history[history.length - 1].createdAt).toLocaleTimeString()}
                   </Popup>
-                  <Tooltip permanent direction="top" offset={[0, -40]}>Last Seen</Tooltip>
+                  <Tooltip permanent direction="top" offset={[0, -40]}>Current</Tooltip>
                 </Marker>
               </MapContainer>
             ) : (
               <div className="empty-state" style={{ padding: "150px 20px", textAlign: "center" }}>
-                <div style={{ fontSize: "50px" }}>📍</div>
-                <h3>No Route Found</h3>
-                <p>Select an officer and date to visualize the travel logs.</p>
+                <div style={{ fontSize: "50px" }}>🗺️</div>
+                <h3>Detailed Route History</h3>
+                <p>Select an officer to see street-level travel data.</p>
               </div>
             )}
           </div>
