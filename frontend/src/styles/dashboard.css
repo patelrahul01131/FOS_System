@@ -634,71 +634,78 @@ button {
     color: #1a202c;
 }
 
-/* --- Updated Sidebar Base --- */
+/* --- Base Sidebar Fixes --- */
 .sidebar {
   width: 260px;
   background: #1a1c23;
   color: white;
   display: flex;
   flex-direction: column;
-  transition: transform 0.3s ease-in-out;
   height: 100vh;
   position: sticky;
   top: 0;
   z-index: 1000;
+  transition: transform 0.3s ease-in-out;
 }
 
-/* --- Hamburger Button Styles --- */
-.hamburger {
-  display: none; /* Hidden on Desktop */
-  position: fixed;
-  top: 15px;
-  left: 15px;
-  z-index: 1100;
-  background: #4f46e5;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  width: 40px;
-  height: 40px;
-  font-size: 20px;
-  cursor: pointer;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+.sidebar-nav {
+  display: flex;
+  flex-direction: column; /* Forces vertical links */
+  padding: 20px 0;
 }
 
-/* --- Mobile Specific Rules (Max-Width: 768px) --- */
+/* --- Mobile Specific Fixes (Max-Width: 768px) --- */
 @media (max-width: 768px) {
-  .hamburger {
-    display: block; /* Show hamburger on mobile */
-  }
-
   .sidebar {
     position: fixed;
     left: 0;
-    transform: translateX(-100%); /* Hide off-screen */
+    top: 0;
+    transform: translateX(-100%); /* Keeps it hidden off-screen */
+    width: 280px; /* Slightly wider for mobile readability */
+    box-shadow: 10px 0 15px rgba(0,0,0,0.3);
   }
 
   .sidebar.open {
-    transform: translateX(0); /* Slide in when open */
+    transform: translateX(0); /* Slides in */
   }
 
-  .sidebar-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 999;
+  .sidebar-nav {
+    flex-direction: column; /* Ensures links don't horizontal scroll */
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
-  .main-content {
+  .sidebar-nav a {
+    display: block;
     width: 100%;
-    padding-top: 60px; /* Space for hamburger button */
+    padding: 15px 25px; /* Bigger touch targets for mobile */
+    white-space: normal; /* Allows text to wrap if needed */
   }
 
   .sidebar-brand {
-    display: block; /* Re-enable brand for the drawer */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     padding: 40px 20px 20px;
+    position: relative;
+  }
+
+  .close-sidebar-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+  }
+
+  .hamburger {
+    display: block;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 999; /* Below the sidebar but above main content */
   }
 }

@@ -4,7 +4,7 @@ import { useState } from "react";
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [isOpen, setIsOpen] = useState(false); // State for mobile toggle
+  const [isOpen, setIsOpen] = useState(false);
   const role = localStorage.getItem("role"); 
   const isAdmin = role === "admin";
 
@@ -20,16 +20,15 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Hamburger Button - Only visible on mobile */}
       <button className="hamburger" onClick={toggleSidebar}>
         {isOpen ? "✕" : "☰"}
       </button>
 
-      {/* Overlay - Closes sidebar when clicking outside on mobile */}
       {isOpen && <div className="sidebar-overlay" onClick={closeSidebar}></div>}
 
       <div className={`sidebar ${isOpen ? "open" : ""}`}>
         <div className="sidebar-brand">
+          <button className="close-sidebar-btn" onClick={closeSidebar}>✕</button>
           <h2>Satnam Sales</h2>
           <span className="role-badge">{role}</span>
         </div>
