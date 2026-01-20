@@ -1,6 +1,6 @@
 import express from "express";
 import auth from "../middleware/auth.js";
-import isAdmin from "../middleware/isAdmin.js"; // <--- ADD THIS IMPORT
+import isAdmin from "../middleware/isAdmin.js";
 import Expense from "../models/Expense.js";
 
 const router = express.Router();
@@ -8,7 +8,6 @@ const router = express.Router();
 // 1. User: Get their own past expenses
 router.get("/my-expenses", auth, async (req, res) => {
   try {
-    // Correctly filter by the logged-in user's ID
     const expenses = await Expense.find({ user: req.user.id }).sort({ date: -1 });
     res.json(expenses);
   } catch (err) {
@@ -17,16 +16,12 @@ router.get("/my-expenses", auth, async (req, res) => {
   }
 });
 
-// 2. Admin: Get filtered reports (Requires isAdmin)
-// backend/routes/expenseRoutes.js
-
-// This matches: GET http://localhost:5000/api/expenses/report
+// 2. Admin: Get filtered reports
 router.get("/report", auth, isAdmin, async (req, res) => {
   try {
     const { userId, type, range, startDate, endDate, category } = req.query;
     let query = {};
 
-    // 1. Filter by Category
     if (category === "office") {
       query.user = null; 
     } else if (userId) {
@@ -37,7 +32,6 @@ router.get("/report", auth, isAdmin, async (req, res) => {
 
     if (type) query.type = type;
 
-    // 2. Date Filtering Logic
     let start = new Date();
     if (range === "monthly") {
       start.setDate(1);
@@ -92,13 +86,58 @@ router.post("/", auth, async (req, res) => {
     const newExpense = new Expense({
       user: req.user.id, 
       type,
-      amount: Number(amount), // Ensure it's a number
+      amount: Number(amount),
       note,
       date: new Date()
     });
 
     await newExpense.save();
     res.status(201).json({ message: "Expense added successfully", expense: newExpense });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+// 5. PUT: Update an existing expense (Added for Modify feature)
+router.put("/:id", auth, async (req, res) => {
+  try {
+    const { type, amount, note } = req.body;
+    let expense = await Expense.findById(req.params.id);
+
+    if (!expense) return res.status(404).json({ message: "Expense not found" });
+
+    // Check ownership
+    if (expense.user && expense.user.toString() !== req.user.id) {
+      return res.status(401).json({ message: "User not authorized" });
+    }
+
+    expense.type = type || expense.type;
+    expense.amount = amount ? Number(amount) : expense.amount;
+    expense.note = note !== undefined ? note : expense.note;
+
+    await expense.save();
+    res.json(expense);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+// 6. DELETE: Remove an expense (Added for Delete feature)
+router.delete("/:id", auth, async (req, res) => {
+  try {
+    const expense = await Expense.findById(req.params.id);
+
+    if (!expense) return res.status(404).json({ message: "Expense not found" });
+
+    // Check ownership
+    if (expense.user && expense.user.toString() !== req.user.id) {
+      return res.status(401).json({ message: "User not authorized" });
+    }
+
+    await expense.deleteOne();
+    res.json({ message: "Expense removed" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server Error" });

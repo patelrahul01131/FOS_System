@@ -609,3 +609,27 @@ button {
   color: #4f46e5;
   font-weight: 600;
 }
+
+.flex-gap {
+    display: flex;
+    gap: 10px;
+}
+
+.text-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 5px;
+}
+
+.text-btn.blue { color: #4f46e5; }
+.text-btn.red { color: #e11d48; }
+
+.text-btn:hover { text-decoration: underline; }
+
+.amount-cell {
+    font-weight: 700;
+    color: #1a202c;
+}
