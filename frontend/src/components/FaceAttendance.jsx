@@ -11,6 +11,14 @@ export default function FaceAttendance() {
   const [message, setMessage] = useState("");
   const [image, setImage] = useState(null);
 
+  // Helper to format distance for the UI
+  const formatDistance = (meters) => {
+    if (meters >= 1000) {
+      return (meters / 1000).toFixed(2) + " km";
+    }
+    return Math.round(meters) + " m";
+  };
+
   const getDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371e3; 
     const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -21,7 +29,6 @@ export default function FaceAttendance() {
     return R * c; 
   };
 
-  // NEW: Reusable function to turn off camera
   const stopCamera = () => {
     if (videoRef.current && videoRef.current.srcObject) {
       const stream = videoRef.current.srcObject;
@@ -70,26 +77,13 @@ export default function FaceAttendance() {
       const OFFICE_LNG = 72.18390649958799;
       const MAX_DISTANCE = 500; 
 
-      // const distance = getDistance(latitude, longitude, OFFICE_LAT, OFFICE_LNG);
-
-        const formatDistance = (meters) => {
-        if (meters >= 1000) {
-          // Convert to km and keep 2 decimal places
-          return (meters / 1000).toFixed(2) + " km";
-        } else {
-          // Show in meters as a whole number
-          return Math.round(meters) + " m";
-        }
-      };
-
-      // Implementation in your code
-      const distanceInMeters = getDistance(latitude, longitude, OFFICE_LAT, OFFICE_LNG);
-      const distance = formatDistance(distanceInMeters);
+      const distance = getDistance(latitude, longitude, OFFICE_LAT, OFFICE_LNG);
 
       if (distance > MAX_DISTANCE) {
-        // TURN OFF CAMERA HERE
         stopCamera(); 
-        return setMessage(`Access Denied: You are ${distance}m away from the office. Camera turned off.`);
+        // Logic: Format the distance based on whether it is >= 1000m
+        const formattedDistance = formatDistance(distance);
+        return setMessage(`Access Denied: You are ${formattedDistance} away from the office. Camera turned off.`);
       }
 
       const canvas = canvasRef.current;
@@ -101,10 +95,7 @@ export default function FaceAttendance() {
 
       try {
         await api.post("/attendance", { image: img, lat: latitude, lng: longitude });
-        
-        // TURN OFF CAMERA HERE AS WELL
         stopCamera(); 
-
         setMarked(true);
         setImage(img);
         setMessage("Attendance marked for today ✅");
