@@ -89,7 +89,7 @@ export default function FaceAttendance() {
       if (distance > MAX_DISTANCE) {
         // TURN OFF CAMERA HERE
         stopCamera(); 
-        return setMessage(`Access Denied: You are ${Math.round(distance)}m away from the office. Camera turned off.`);
+        return setMessage(`Access Denied: You are ${distance}m away from the office. Camera turned off.`);
       }
 
       const canvas = canvasRef.current;
