@@ -68,9 +68,23 @@ export default function FaceAttendance() {
       
       const OFFICE_LAT = 24.264434461721187; 
       const OFFICE_LNG = 72.18390649958799;
-      const MAX_DISTANCE = 100; 
+      const MAX_DISTANCE = 500; 
 
-      const distance = getDistance(latitude, longitude, OFFICE_LAT, OFFICE_LNG);
+      // const distance = getDistance(latitude, longitude, OFFICE_LAT, OFFICE_LNG);
+
+        const formatDistance = (meters) => {
+        if (meters >= 1000) {
+          // Convert to km and keep 2 decimal places
+          return (meters / 1000).toFixed(2) + " km";
+        } else {
+          // Show in meters as a whole number
+          return Math.round(meters) + " m";
+        }
+      };
+
+      // Implementation in your code
+      const distanceInMeters = getDistance(latitude, longitude, OFFICE_LAT, OFFICE_LNG);
+      const distance = formatDistance(distanceInMeters);
 
       if (distance > MAX_DISTANCE) {
         // TURN OFF CAMERA HERE
