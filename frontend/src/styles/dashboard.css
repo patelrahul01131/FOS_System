@@ -1,4 +1,4 @@
-/* 1. BASE LAYOUT & RESET */
+/* --- Base Reset & Layout --- */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -19,7 +19,7 @@
     padding: 20px;
 }
 
-/* 2. SIDEBAR (Desktop Version) */
+/* --- Sidebar (Modern Version) --- */
 .sidebar {
     width: 260px;
     background: #1a1c23;
@@ -29,7 +29,7 @@
     height: 100vh;
     position: sticky;
     top: 0;
-    z-index: 2000;
+    z-index: 2000; 
     transition: transform 0.3s ease-in-out;
 }
 
@@ -37,6 +37,10 @@
     padding: 30px 20px;
     text-align: center;
     border-bottom: 1px solid #2d2f39;
+}
+
+.sidebar-brand h2 {
+    margin-bottom: 10px;
 }
 
 .role-badge {
@@ -83,11 +87,12 @@
     cursor: pointer;
 }
 
-/* 3. CARDS & CONTAINERS */
-.dashboard-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    width: 100%;
+/* --- Content Components --- */
+.topbar {
+    background: #fff;
+    padding: 15px 20px;
+    border-radius: 6px;
+    margin-bottom: 20px;
 }
 
 .glass-card, .card {
@@ -100,12 +105,15 @@
     z-index: 1;
 }
 
-/* 4. MODERN TABLES */
+.mt { margin-top: 20px; }
+
+/* --- Table Styling --- */
 .table-responsive {
     width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     margin-top: 15px;
+    border-radius: 8px;
 }
 
 .modern-table, .user-table {
@@ -135,7 +143,7 @@
     font-size: 12px;
 }
 
-/* 5. COMPONENTS (Badges, Buttons, Dots) */
+/* --- Badges & Status --- */
 .status-dot {
     width: 10px;
     height: 10px;
@@ -155,7 +163,25 @@
 .present { background: #c6f6d5; color: #22543d; }
 .absent { background: #fed7d7; color: #822727; }
 
-/* 6. MOBILE RESPONSIVE RULES */
+/* --- Forms & Inputs --- */
+input, select {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+button {
+    padding: 10px;
+    background: #4f46e5;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+/* --- Mobile Specific Fixes --- */
 @media (max-width: 768px) {
     .sidebar {
         position: fixed;
@@ -163,7 +189,7 @@
         top: 0;
         transform: translateX(-100%);
         width: 280px;
-        z-index: 3000;
+        z-index: 3000; 
     }
 
     .sidebar.open {
@@ -172,6 +198,8 @@
 
     .close-btn {
         display: block;
+        background: none;
+        border: none;
         color: white;
         font-size: 24px;
         position: absolute;
@@ -184,7 +212,19 @@
     .modern-table td { 
         display: block; 
         text-align: right; 
-        position: relative;
+        border-bottom: 1px solid #edf2f7;
         padding-left: 50%;
+        position: relative;
     }
+}
+
+/* Overlay for Mobile Sidebar */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 2500;
 }
