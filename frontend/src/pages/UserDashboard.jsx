@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import for navigation
 import Sidebar from "../components/Sidebar";
 import Topbar from "../components/Topbar";
 import FaceAttendance from "../components/FaceAttendance";
@@ -8,6 +9,7 @@ import api from "../services/api";
 import "../styles/dashboard.css";
 
 export default function UserDashboard() {
+  const navigate = useNavigate(); // Hook for redirection
   const [status, setStatus] = useState("Offline");
   const [lastUpdate, setLastUpdate] = useState("--");
   const [user, setUser] = useState(null);
@@ -15,12 +17,19 @@ export default function UserDashboard() {
   const [expense, setExpense] = useState({ type: "Travel", amount: "", note: "" });
 
   useEffect(() => {
+    // NEW: Immediate check for token presence
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/"); // Redirect if no token exists
+      return;
+    }
+
     api.get("/users/me")
       .then(res => setUser(res.data))
       .catch(err => console.error("Error fetching profile", err));
     
     fetchTodayExpenses();
-  }, []);
+  }, [navigate]); // Added navigate to dependency array
 
   const fetchTodayExpenses = async () => {
     try {
@@ -38,14 +47,12 @@ export default function UserDashboard() {
 
     setStatus("Online");
 
-    // Options to force the GPS to stay active
     const geoOptions = {
-      enableHighAccuracy: true, // Uses GPS hardware, not just Wi-Fi
-      maximumAge: 0,            // Do not use cached locations
-      timeout: 10000            // Wait up to 10s for a fix
+      enableHighAccuracy: true,
+      maximumAge: 0,
+      timeout: 10000
     };
 
-    // Use watchPosition instead of an interval for background support
     const watchId = navigator.geolocation.watchPosition(
       (pos) => {
         socket.emit("sendLocation", {
@@ -60,7 +67,6 @@ export default function UserDashboard() {
       geoOptions
     );
 
-    // Cleanup: Stop the GPS hardware when user logs out/closes dashboard
     return () => {
       navigator.geolocation.clearWatch(watchId);
       setStatus("Offline");

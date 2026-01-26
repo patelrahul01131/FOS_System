@@ -16,4 +16,22 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// NEW: Interceptor to handle token expiration/unauthorized errors
+api.interceptors.response.use(
+  (response) => response, // Pass through successful responses
+  (error) => {
+    // Check if the error is 401 (Unauthorized) or 403 (Forbidden)
+    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+      console.warn("Token expired or invalid. Redirecting to login...");
+      
+      // 1. Clear all session data
+      localStorage.clear();
+      
+      // 2. Force a full page reload to the root (Login)
+      window.location.href = "/"; 
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api;
