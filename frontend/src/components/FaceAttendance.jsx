@@ -73,8 +73,8 @@ export default function FaceAttendance() {
     navigator.geolocation.getCurrentPosition(async (position) => {
       const { latitude, longitude } = position.coords;
       
-      const OFFICE_LAT = 24.264434461721187; 
-      const OFFICE_LNG = 72.18390649958799;
+      const OFFICE_LAT = 24.262040676509187; 
+      const OFFICE_LNG = 72.20312228155572;
       const MAX_DISTANCE = 1000; 
 
       const distance = getDistance(latitude, longitude, OFFICE_LAT, OFFICE_LNG);

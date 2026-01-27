@@ -41,9 +41,9 @@ router.post("/", auth, async (req, res) => {
     const { image, lat, lng } = req.body;
 
     // 1. SET YOUR OFFICE LOCATION HERE
-    const OFFICE_LAT = 23.0225; 
-    const OFFICE_LNG = 72.5714;
-    const MAX_DISTANCE = 150; // Allowed radius in meters
+    const OFFICE_LAT = 24.262040676509187; 
+    const OFFICE_LNG = 72.20312228155572;
+    const MAX_DISTANCE = 1000; // Allowed radius in meters
 
     // 2. Validate Location
     if (!lat || !lng) {
