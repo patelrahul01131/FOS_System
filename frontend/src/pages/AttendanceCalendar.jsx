@@ -11,7 +11,6 @@ export default function AttendanceCalendar() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch all past attendance for the current user
     api.get("/attendance/history")
       .then(res => {
         setAttendanceData(res.data);
@@ -20,21 +19,15 @@ export default function AttendanceCalendar() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Function to determine tile colors: Green (Present), Red (Absent), Yellow (Sunday/Holiday)
   const getTileClassName = ({ date, view }) => {
     if (view === 'month') {
-      const dateString = date.toLocaleDateString('en-CA'); // YYYY-MM-DD
-      const isSunday = date.getDay() === 0; // 0 represents Sunday
-      
+      const dateString = date.toLocaleDateString('en-CA');
+      const isSunday = date.getDay() === 0;
       const record = attendanceData.find(a => a.date === dateString);
 
-      // 1. If user was present, show Green
       if (record) return 'tile-present';
-
-      // 2. If it is Sunday, show Yellow (Holiday)
       if (isSunday) return 'tile-holiday';
 
-      // 3. If date is in the past and no record/not Sunday, mark as Red (Absent)
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       if (date < today) return 'tile-absent';
@@ -57,11 +50,11 @@ export default function AttendanceCalendar() {
             ) : (
               <div className="calendar-wrapper">
                 <Calendar 
+                  locale="en-US"
                   tileClassName={getTileClassName}
                   className="modern-calendar"
-                  /* react-calendar has built-in buttons to change months by default */
-                  prev2Label={null} // Hide "jump to previous year" for cleaner UI
-                  next2Label={null} // Hide "jump to next year"
+                  prev2Label={null}
+                  next2Label={null}
                 />
               </div>
             )}

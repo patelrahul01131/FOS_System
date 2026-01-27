@@ -775,42 +775,42 @@ button {
   padding: 10px;
 }
 
+/* Ensure the numbers are always visible */
+.react-calendar__tile {
+  color: #333 !important; /* Default text color for numbers */
+  font-weight: 500;
+}
+
 /* Green: Present */
-.tile-present {
-  background-color: #c6f6d5 !important; /* light green */
-  color: #22543d !important;
+.tile-present, .tile-present:enabled:hover, .tile-present:enabled:focus {
+  background-color: #c6f6d5 !important;
+  color: #22543d !important; /* Dark green text */
   border-radius: 6px;
 }
 
 /* Red: Absent */
-.tile-absent {
-  background-color: #fed7d7 !important; /* light red */
-  color: #822727 !important;
+.tile-absent, .tile-absent:enabled:hover, .tile-absent:enabled:focus {
+  background-color: #fed7d7 !important;
+  color: #822727 !important; /* Dark red text */
   border-radius: 6px;
 }
 
 /* Yellow: Sunday Holiday */
-.tile-holiday {
-  background-color: #fef3c7 !important; /* light yellow */
-  color: #92400e !important;
+.tile-holiday, .tile-holiday:enabled:hover, .tile-holiday:enabled:focus {
+  background-color: #fef3c7 !important;
+  color: #92400e !important; /* Dark brownish-yellow text */
   border-radius: 6px;
 }
 
-/* Legend Dots */
-.dot {
-  height: 12px;
-  width: 12px;
-  border-radius: 50%;
-  display: inline-block;
-  margin-right: 5px;
+/* Fixing the "White on White" or invisible text issue */
+.react-calendar__month-view__days__day--neighboringMonth {
+  color: #cbd5e0 !important; /* Light gray for dates from other months */
 }
-.dot.present { background-color: #2ecc71; }
-.dot.absent { background-color: #e74c3c; }
-.dot.holiday { background-color: #f1c40f; }
 
-/* Calendar Navigation Buttons */
+/* Navigation Buttons */
 .react-calendar__navigation button {
   font-weight: bold;
   font-size: 16px;
-  color: #4f46e5;
+  color: #4f46e5 !important;
+  background: none;
 }
