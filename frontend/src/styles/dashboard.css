@@ -757,46 +757,60 @@ button {
 }
 
 
-/* Calendar Styles */
+/* Calendar Wrapper */
 .calendar-wrapper {
   display: flex;
   justify-content: center;
-  padding: 20px;
+  padding: 10px;
 }
 
+/* Modern Calendar Styling */
 .modern-calendar {
   width: 100% !important;
-  max-width: 500px;
-  border: none !important;
+  max-width: 450px;
+  background: white !important;
+  border: 1px solid #e2e8f0 !important;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  font-family: 'Inter', sans-serif;
+  padding: 10px;
 }
 
-/* Green Tile for Present */
+/* Green: Present */
 .tile-present {
-  background-color: #c6f6d5 !important;
+  background-color: #c6f6d5 !important; /* light green */
   color: #22543d !important;
-  border-radius: 8px;
+  border-radius: 6px;
 }
 
-/* Red Tile for Absent */
+/* Red: Absent */
 .tile-absent {
-  background-color: #fed7d7 !important;
+  background-color: #fed7d7 !important; /* light red */
   color: #822727 !important;
-  border-radius: 8px;
+  border-radius: 6px;
 }
 
-.calendar-legend {
-  display: flex;
-  gap: 20px;
-  justify-content: center;
+/* Yellow: Sunday Holiday */
+.tile-holiday {
+  background-color: #fef3c7 !important; /* light yellow */
+  color: #92400e !important;
+  border-radius: 6px;
 }
 
+/* Legend Dots */
 .dot {
-  height: 10px;
-  width: 10px;
+  height: 12px;
+  width: 12px;
   border-radius: 50%;
   display: inline-block;
+  margin-right: 5px;
 }
-.dot.present { background: #2ecc71; }
-.dot.absent { background: #e74c3c; }
+.dot.present { background-color: #2ecc71; }
+.dot.absent { background-color: #e74c3c; }
+.dot.holiday { background-color: #f1c40f; }
+
+/* Calendar Navigation Buttons */
+.react-calendar__navigation button {
+  font-weight: bold;
+  font-size: 16px;
+  color: #4f46e5;
+}

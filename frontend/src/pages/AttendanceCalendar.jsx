@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Calendar from "react-calendar"; // You may need to run: npm install react-calendar
+import Calendar from "react-calendar";
 import 'react-calendar/dist/Calendar.css';
 import Sidebar from "../components/Sidebar";
 import Topbar from "../components/Topbar";
@@ -20,16 +20,24 @@ export default function AttendanceCalendar() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Function to determine if a date should be Green (Present) or Red (Absent)
+  // Function to determine tile colors: Green (Present), Red (Absent), Yellow (Sunday/Holiday)
   const getTileClassName = ({ date, view }) => {
     if (view === 'month') {
-      const dateString = date.toLocaleDateString('en-CA'); // Format: YYYY-MM-DD
+      const dateString = date.toLocaleDateString('en-CA'); // YYYY-MM-DD
+      const isSunday = date.getDay() === 0; // 0 represents Sunday
+      
       const record = attendanceData.find(a => a.date === dateString);
-      
-      if (record) return 'tile-present'; // Green
-      
-      // If date is in the past and no record exists, mark as absent
-      if (date < new Date().setHours(0,0,0,0)) return 'tile-absent'; // Red
+
+      // 1. If user was present, show Green
+      if (record) return 'tile-present';
+
+      // 2. If it is Sunday, show Yellow (Holiday)
+      if (isSunday) return 'tile-holiday';
+
+      // 3. If date is in the past and no record/not Sunday, mark as Red (Absent)
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (date < today) return 'tile-absent';
     }
   };
 
@@ -43,19 +51,25 @@ export default function AttendanceCalendar() {
             <div className="card-header">
               <h4>My Attendance History</h4>
             </div>
+            
             {loading ? (
-              <p className="empty-state">Loading your records...</p>
+              <p className="empty-state">Loading records...</p>
             ) : (
               <div className="calendar-wrapper">
                 <Calendar 
                   tileClassName={getTileClassName}
                   className="modern-calendar"
+                  /* react-calendar has built-in buttons to change months by default */
+                  prev2Label={null} // Hide "jump to previous year" for cleaner UI
+                  next2Label={null} // Hide "jump to next year"
                 />
               </div>
             )}
-            <div className="calendar-legend mt">
+
+            <div className="calendar-legend" style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginTop: '20px' }}>
               <span className="legend-item"><span className="dot present"></span> Present</span>
               <span className="legend-item"><span className="dot absent"></span> Absent</span>
+              <span className="legend-item"><span className="dot holiday"></span> Holiday</span>
             </div>
           </div>
         </div>
