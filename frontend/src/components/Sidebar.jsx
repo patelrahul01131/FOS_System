@@ -15,12 +15,10 @@ export default function Sidebar() {
 
   const toggleSidebar = () => setIsOpen(!isOpen);
   const closeSidebar = () => setIsOpen(false);
-
   const isActive = (path) => location.pathname === path ? "active" : "";
 
   return (
     <>
-      {/* Fixed Hamburger Position */}
       <button className="hamburger" onClick={toggleSidebar}>
         {isOpen ? "✕" : "☰"}
       </button>
@@ -48,16 +46,14 @@ export default function Sidebar() {
           ) : (
             <>
               <Link to="/user/dashboard" className={isActive("/user/dashboard")} onClick={closeSidebar}>🏠 Dashboard</Link>
+              <Link to="/user/calendar" className={isActive("/user/calendar")} onClick={closeSidebar}>📅 My Attendance</Link> {/* New Link */}
               <Link to="/user/expenses" className={isActive("/user/expenses")} onClick={closeSidebar}>💸 My Expenses</Link>
             </>
           )}
         </nav>
 
-        {/* Footer wrapper for Logout button */}
         <div className="sidebar-footer">
-          <button onClick={handleLogout} className="logout-btn">
-            🚪 Logout
-          </button>
+          <button onClick={handleLogout} className="logout-btn">🚪 Logout</button>
         </div>
       </div>
     </>

@@ -35,6 +35,18 @@ router.get("/today", auth, async (req, res) => {
   }
 });
 
+
+router.get("/history", auth, async (req, res) => {
+  try {
+    const history = await Attendance.find({ user: req.user.id })
+      .select("date")
+      .sort({ date: -1 });
+    res.json(history);
+  } catch (err) {
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
 // POST: Save new attendance
 router.post("/", auth, async (req, res) => {
   try {
