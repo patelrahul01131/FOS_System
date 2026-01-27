@@ -11,11 +11,8 @@ export default function FaceAttendance() {
   const [message, setMessage] = useState("");
   const [image, setImage] = useState(null);
 
-  // Helper to format distance for the UI
   const formatDistance = (meters) => {
-    if (meters >= 1000) {
-      return (meters / 1000).toFixed(2) + " km";
-    }
+    if (meters >= 1000) return (meters / 1000).toFixed(2) + " km";
     return Math.round(meters) + " m";
   };
 
@@ -64,15 +61,11 @@ export default function FaceAttendance() {
   };
 
   const markAttendance = async () => {
-    if (!navigator.geolocation) {
-      return setMessage("Geolocation is not supported by your browser.");
-    }
-
+    if (!navigator.geolocation) return setMessage("Geolocation not supported.");
     setMessage("Verifying location...");
 
     navigator.geolocation.getCurrentPosition(async (position) => {
       const { latitude, longitude } = position.coords;
-      
       const OFFICE_LAT = 24.262040676509187; 
       const OFFICE_LNG = 72.20312228155572;
       const MAX_DISTANCE = 1000; 
@@ -81,9 +74,7 @@ export default function FaceAttendance() {
 
       if (distance > MAX_DISTANCE) {
         stopCamera(); 
-        // Logic: Format the distance based on whether it is >= 1000m
-        const formattedDistance = formatDistance(distance);
-        return setMessage(`Access Denied: You are ${formattedDistance} away from the office. Camera turned off.`);
+        return setMessage(`Access Denied: You are ${formatDistance(distance)} away.`);
       }
 
       const canvas = canvasRef.current;
@@ -96,26 +87,23 @@ export default function FaceAttendance() {
       try {
         await api.post("/attendance", { image: img, lat: latitude, lng: longitude });
         stopCamera(); 
-        setMarked(true);
+        setMarked(true); // This hides the buttons immediately
         setImage(img);
-        setMessage("Attendance marked for today ✅");
+        setMessage("Attendance marked successfully ✅");
       } catch (err) {
         setMessage(err.response?.data?.message || "Error saving attendance");
       }
-    }, (err) => {
-      setMessage("Please enable Location access to mark attendance.");
-    });
+    }, (err) => setMessage("Allow location access."), { enableHighAccuracy: true });
   };
 
   if (loading) return <div className="card">Checking status...</div>;
 
+  // The conditional rendering below ensures buttons are hidden if marked === true
   if (marked) {
     return (
       <div className="attendance-success card">
         <p style={{ color: 'green', fontWeight: 'bold' }}>{message}</p>
-        {image && (
-          <img src={image} alt="today" style={{ width: "200px", borderRadius: "8px" }} />
-        )}
+        {image && <img src={image} alt="today" style={{ width: "200px", borderRadius: "8px" }} />}
       </div>
     );
   }
@@ -123,24 +111,18 @@ export default function FaceAttendance() {
   return (
     <div className="attendance-container">
       {!active ? (
-        <button className="btn-primary" onClick={startCamera}>
-          Open Camera to Mark Attendance
-        </button>
+        <button className="btn-primary" onClick={startCamera}>Open Camera to Mark Attendance</button>
       ) : (
         <div className="camera-box">
           <video ref={videoRef} autoPlay width="300" style={{ borderRadius: '8px' }} />
           <canvas ref={canvasRef} hidden />
           <div style={{ marginTop: '10px' }}>
-            <button className="btn-success" onClick={markAttendance}>
-              Capture & Mark Attendance
-            </button>
-            <button className="btn-secondary" onClick={stopCamera} style={{marginLeft: '10px'}}>
-              Cancel
-            </button>
+            <button className="btn-success" onClick={markAttendance}>Capture & Mark Attendance</button>
+            <button className="btn-secondary" onClick={stopCamera} style={{marginLeft: '10px'}}>Cancel</button>
           </div>
         </div>
       )}
-      {message && <p className="status-msg" style={{ color: message.includes('Denied') ? 'red' : 'inherit' }}>{message}</p>}
+      {message && <p style={{ color: message.includes('Denied') ? 'red' : 'inherit' }}>{message}</p>}
     </div>
   );
 }
