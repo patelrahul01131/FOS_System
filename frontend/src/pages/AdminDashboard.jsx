@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom"; // Added Link
+import { Link } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import Topbar from "../components/Topbar";
 import api from "../services/api";
@@ -11,6 +11,11 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    fetchLogs();
+  }, []);
+
+  const fetchLogs = () => {
+    setLoading(true);
     api.get("/admin/attendance") 
       .then(res => {
         setAttendance(res.data);
@@ -20,7 +25,7 @@ export default function AdminDashboard() {
         console.error("Fetch error:", err);
         setLoading(false);
       });
-  }, []);
+  };
 
   const presentCount = attendance.filter(a => a.marked).length;
   const totalUsers = attendance.length;
@@ -61,7 +66,7 @@ export default function AdminDashboard() {
           <div className="glass-card mt">
             <div className="card-header flex-between">
               <h4>🕒 Today's Attendance Logs</h4>
-              <button className="btn-outline" onClick={() => window.location.reload()}>Refresh</button>
+              <button className="btn-outline" onClick={fetchLogs}>Refresh</button>
             </div>
 
             <div className="table-responsive">
@@ -82,7 +87,6 @@ export default function AdminDashboard() {
                       <tr key={a._id}>
                         <td className="user-cell">
                           <div className="user-info-box">
-                            {/* Made the name clickable to navigate to History */}
                             <Link to={`/admin/history?userId=${a._id}`} className="user-name" style={{ color: "#4f46e5", fontWeight: "bold" }}>
                               {a.user?.name || "Unknown"}
                             </Link>
@@ -97,6 +101,7 @@ export default function AdminDashboard() {
                           )}
                         </td>
                         <td className="time-cell">
+                          {/* Use createdAt if available for accurate check-in time */}
                           {a.marked ? new Date(a.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "--:--"}
                         </td>
                         <td>

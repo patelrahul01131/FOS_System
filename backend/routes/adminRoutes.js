@@ -8,17 +8,17 @@ import LocationHistory from "../models/LocationHistory.js";
 
 const router = express.Router();
 
-// GET TODAY'S SUMMARY
+// GET TODAY'S SUMMARY (Fixed for String Dates)
 router.get("/attendance", auth, isAdmin, async (req, res) => {
   try {
-    const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date();
-    endOfDay.setHours(23, 59, 59, 999);
+    // Get local date string in YYYY-MM-DD format
+    const todayStr = new Date().toLocaleDateString('en-CA'); 
 
     const users = await User.find({ role: "user" }).select("name email");
+    
+    // Search using the string format saved by your POST route
     const todayRecords = await Attendance.find({
-      date: { $gte: startOfDay, $lte: endOfDay }
+      date: todayStr 
     });
 
     const summary = users.map(user => {
@@ -26,7 +26,8 @@ router.get("/attendance", auth, isAdmin, async (req, res) => {
       return {
         _id: user._id,
         user: { name: user.name, email: user.email },
-        date: record ? record.date : new Date(),
+        // Fallback to now if no record, but marked will be false
+        date: record ? record.createdAt : new Date(), 
         image: record ? record.image : null,
         marked: !!record
       };
@@ -34,6 +35,7 @@ router.get("/attendance", auth, isAdmin, async (req, res) => {
 
     res.json(summary);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Error fetching attendance summary" });
   }
 });
