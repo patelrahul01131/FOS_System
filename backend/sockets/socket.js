@@ -17,32 +17,19 @@ export default function init(server) {
   });
 
   io.on("connection", socket => {
-    // Update user status to online
+    // Join a room based on role for targeted notifications
+    socket.join(socket.user.role); 
     User.findByIdAndUpdate(socket.user.id, { online: true }).exec();
 
     socket.on("sendLocation", async (data) => {
       try {
-        // Fetch verified name from DB
         const dbUser = await User.findById(socket.user.id);
         const userName = dbUser ? dbUser.name : "Unknown User";
+        const loc = { lat: data.lat, lng: data.lng, userId: socket.user.id };
 
-        const loc = {
-          lat: data.lat,
-          lng: data.lng,
-          userId: socket.user.id
-        };
-
-        // Save to LiveLocation (Latest)
-        await LiveLocation.findOneAndUpdate(
-          { userId: socket.user.id },
-          loc,
-          { upsert: true }
-        );
-
-        // Save to LocationHistory (Logs for path history)
+        await LiveLocation.findOneAndUpdate({ userId: socket.user.id }, loc, { upsert: true });
         await LocationHistory.create(loc);
 
-        // Emit to Admin with VERIFIED User Name
         io.emit("adminLiveLocation", { 
           userId: socket.user.id, 
           name: userName, 
@@ -54,9 +41,19 @@ export default function init(server) {
       }
     });
 
+    // NEW: Handle Location Disabled Warning
+    socket.on("gpsDisabled", (data) => {
+      io.to("admin").emit("notification", {
+        title: "GPS Warning",
+        message: `${data.name} has disabled location tracking!`,
+        type: "warning"
+      });
+    });
+
     socket.on("disconnect", () => {
-      // Update user status to offline
       User.findByIdAndUpdate(socket.user.id, { online: false }).exec();
     });
   });
+
+  return io;
 }

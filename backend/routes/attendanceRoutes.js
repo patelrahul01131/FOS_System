@@ -47,7 +47,6 @@ router.get("/history", auth, async (req, res) => {
   }
 });
 
-// POST: Save new attendance
 router.post("/", auth, async (req, res) => {
   try {
     const { image, lat, lng } = req.body;
@@ -59,20 +58,22 @@ router.post("/", auth, async (req, res) => {
 
     const distance = getDistance(lat, lng, OFFICE_LAT, OFFICE_LNG);
     if (distance > MAX_DISTANCE) {
-      // Return 400 (Bad Request) instead of 403 to avoid auto-logout interceptors
       return res.status(400).json({ message: `Denied: Out of range.` });
     }
 
     const todayStr = new Date().toLocaleDateString('en-CA');
-
-    const newAttendance = new Attendance({
-      user: req.user.id,
-      image,
-      date: todayStr,
-      location: { lat, lng }
-    });
+    const newAttendance = new Attendance({ user: req.user.id, image, date: todayStr, location: { lat, lng } });
 
     await newAttendance.save();
+
+    // NOTIFICATION TO ADMIN
+    const io = req.app.get("socketio");
+    io.to("admin").emit("notification", {
+      title: "Attendance Marked",
+      message: `${req.user.name} has marked attendance.`,
+      type: "success"
+    });
+
     res.status(201).json({ message: "Attendance marked successfully" });
   } catch (err) {
     if (err.code === 11000) return res.status(400).json({ message: "Already marked today!" });

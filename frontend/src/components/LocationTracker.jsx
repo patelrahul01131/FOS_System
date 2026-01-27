@@ -15,12 +15,6 @@ export default function LocationTracker() {
         socket = connectSocket();
         if (!socket) return;
 
-        const geoOptions = {
-          enableHighAccuracy: true,
-          maximumAge: 0,
-          timeout: 10000
-        };
-
         watchId = navigator.geolocation.watchPosition(
           (pos) => {
             socket.emit("sendLocation", {
@@ -30,19 +24,20 @@ export default function LocationTracker() {
               lng: pos.coords.longitude
             });
           },
-          (err) => console.error("Global GPS Error:", err),
-          geoOptions
+          (err) => {
+            if (err.code === 1) { // Permission Denied
+              socket.emit("gpsDisabled", { name: user.name });
+            }
+          },
+          { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
         );
       } catch (err) {
-        console.error("Tracker: Session check failed", err);
+        console.error("Tracker error", err);
       }
     };
 
     startTracking();
-
-    return () => {
-      if (watchId) navigator.geolocation.clearWatch(watchId);
-    };
+    return () => { if (watchId) navigator.geolocation.clearWatch(watchId); };
   }, []);
 
   return null; 

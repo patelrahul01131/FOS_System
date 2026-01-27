@@ -122,6 +122,34 @@ router.put("/:id", auth, async (req, res) => {
   }
 });
 
+
+router.post("/", auth, async (req, res) => {
+  try {
+    const { type, amount, note } = req.body;
+    const newExpense = new Expense({
+      user: req.user.id, 
+      type,
+      amount: Number(amount),
+      note,
+      date: new Date()
+    });
+
+    await newExpense.save();
+
+    // NOTIFICATION TO ADMIN
+    const io = req.app.get("socketio");
+    io.to("admin").emit("notification", {
+      title: "New Expense",
+      message: `${req.user.name} submitted a ₹${amount} expense.`,
+      type: "info"
+    });
+
+    res.status(201).json({ message: "Expense added successfully", expense: newExpense });
+  } catch (err) {
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
 // 6. Delete Expense (Admin or Owner)
 router.delete("/:id", auth, async (req, res) => {
   try {
