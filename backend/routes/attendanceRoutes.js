@@ -39,9 +39,9 @@ router.get("/today", auth, async (req, res) => {
 router.post("/", auth, async (req, res) => {
   try {
     const { image, lat, lng } = req.body;
-    const OFFICE_LAT = 24.262040676509187; 
-    const OFFICE_LNG = 72.20312228155572;
-    const MAX_DISTANCE = 1000; 
+    const OFFICE_LAT = 24.264434461721187; 
+    const OFFICE_LNG = 72.18390649958799;
+    const MAX_DISTANCE = 200; 
 
     if (!lat || !lng) return res.status(400).json({ message: "Location required." });
 
