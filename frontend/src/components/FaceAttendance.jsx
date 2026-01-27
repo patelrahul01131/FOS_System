@@ -74,7 +74,8 @@ export default function FaceAttendance() {
 
       if (distance > MAX_DISTANCE) {
         stopCamera(); 
-        return setMessage(`Access Denied: You are ${formatDistance(distance)} away.`);
+        const formattedDistance = formatDistance(distance);
+        return setMessage(`Access Denied: You are ${formattedDistance} away from the office.`);
       }
 
       const canvas = canvasRef.current;
@@ -87,7 +88,7 @@ export default function FaceAttendance() {
       try {
         await api.post("/attendance", { image: img, lat: latitude, lng: longitude });
         stopCamera(); 
-        setMarked(true); // This hides the buttons immediately
+        setMarked(true); 
         setImage(img);
         setMessage("Attendance marked successfully ✅");
       } catch (err) {
@@ -98,31 +99,48 @@ export default function FaceAttendance() {
 
   if (loading) return <div className="card">Checking status...</div>;
 
-  // The conditional rendering below ensures buttons are hidden if marked === true
+  // SUCCESS STATE: Replaces the button and camera entirely
   if (marked) {
     return (
-      <div className="attendance-success card">
-        <p style={{ color: 'green', fontWeight: 'bold' }}>{message}</p>
-        {image && <img src={image} alt="today" style={{ width: "200px", borderRadius: "8px" }} />}
+      <div className="attendance-success card" style={{ textAlign: 'center' }}>
+        <p style={{ color: 'green', fontWeight: 'bold', fontSize: '18px' }}>{message}</p>
+        {image && (
+          <img 
+            src={image} 
+            alt="today" 
+            style={{ width: "100%", maxWidth: "300px", borderRadius: "12px", marginTop: "15px", border: "4px solid #2ecc71" }} 
+          />
+        )}
       </div>
     );
   }
 
+  // ACTION STATE: Only shows if not marked
   return (
-    <div className="attendance-container">
+    <div className="attendance-container card">
       {!active ? (
-        <button className="btn-primary" onClick={startCamera}>Open Camera to Mark Attendance</button>
+        <button className="btn-primary" onClick={startCamera}>
+          Open Camera to Mark Attendance
+        </button>
       ) : (
         <div className="camera-box">
-          <video ref={videoRef} autoPlay width="300" style={{ borderRadius: '8px' }} />
+          <video ref={videoRef} autoPlay width="100%" style={{ borderRadius: '8px', maxWidth: '400px' }} />
           <canvas ref={canvasRef} hidden />
-          <div style={{ marginTop: '10px' }}>
-            <button className="btn-success" onClick={markAttendance}>Capture & Mark Attendance</button>
-            <button className="btn-secondary" onClick={stopCamera} style={{marginLeft: '10px'}}>Cancel</button>
+          <div style={{ marginTop: '15px' }}>
+            <button className="btn-success" onClick={markAttendance}>
+              Capture & Mark Attendance
+            </button>
+            <button className="btn-secondary" onClick={stopCamera} style={{marginLeft: '10px'}}>
+              Cancel
+            </button>
           </div>
         </div>
       )}
-      {message && <p style={{ color: message.includes('Denied') ? 'red' : 'inherit' }}>{message}</p>}
+      {message && (
+        <p style={{ marginTop: '10px', color: message.includes('Denied') ? 'red' : '#666', fontWeight: 'bold' }}>
+          {message}
+        </p>
+      )}
     </div>
   );
 }
