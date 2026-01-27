@@ -1,26 +1,21 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import for navigation
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import Topbar from "../components/Topbar";
 import FaceAttendance from "../components/FaceAttendance";
 import UserProfile from "../components/UserProfile";
-import { connectSocket } from "../services/socket";
 import api from "../services/api";
 import "../styles/dashboard.css";
 
 export default function UserDashboard() {
-  const navigate = useNavigate(); // Hook for redirection
-  const [status, setStatus] = useState("Offline");
-  const [lastUpdate, setLastUpdate] = useState("--");
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [todayExpenses, setTodayExpenses] = useState([]);
-  const [expense, setExpense] = useState({ type: "Travel", amount: "", note: "" });
 
   useEffect(() => {
-    // NEW: Immediate check for token presence
     const token = localStorage.getItem("token");
     if (!token) {
-      navigate("/"); // Redirect if no token exists
+      navigate("/");
       return;
     }
 
@@ -29,7 +24,7 @@ export default function UserDashboard() {
       .catch(err => console.error("Error fetching profile", err));
     
     fetchTodayExpenses();
-  }, [navigate]); // Added navigate to dependency array
+  }, [navigate]);
 
   const fetchTodayExpenses = async () => {
     try {
@@ -39,39 +34,6 @@ export default function UserDashboard() {
       console.error("Error fetching today's expenses", err);
     }
   };
-
-  // --- BACKGROUND TRACKING LOGIC ---
-  useEffect(() => {
-    const socket = connectSocket();
-    if (!socket || !user) return;
-
-    setStatus("Online");
-
-    const geoOptions = {
-      enableHighAccuracy: true,
-      maximumAge: 0,
-      timeout: 10000
-    };
-
-    const watchId = navigator.geolocation.watchPosition(
-      (pos) => {
-        socket.emit("sendLocation", {
-          userId: user._id,
-          name: user.name,
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude
-        });
-        setLastUpdate(new Date().toLocaleTimeString());
-      },
-      (err) => console.error("GPS Watch Error:", err),
-      geoOptions
-    );
-
-    return () => {
-      navigator.geolocation.clearWatch(watchId);
-      setStatus("Offline");
-    };
-  }, [user]);
 
   return (
     <div className="layout">
@@ -84,21 +46,6 @@ export default function UserDashboard() {
             <UserProfile />
           </section><br />
           
-          <div className="stats-grid">
-            <div className="stat-card">
-              <span className="stat-label">System Status</span>
-              <div className="stat-value">
-                <span className={`status-dot ${status === "Online" ? "online" : "offline"}`}></span>
-                <span className={status === "Online" ? "text-green" : "text-red"}>{status}</span>
-              </div>
-            </div>
-
-            <div className="stat-card">
-              <span className="stat-label">GPS Live Tracker</span>
-              <div className="stat-value text-blue">{lastUpdate}</div>
-            </div>
-          </div>
-
           <div className="content-grid">
             <div className="glass-card">
               <div className="card-header">

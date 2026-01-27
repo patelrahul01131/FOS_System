@@ -9,7 +9,6 @@ export default function LocationTracker() {
 
     const startTracking = async () => {
       try {
-        // Fetch user info to get the ID and Name
         const res = await api.get("/users/me");
         const user = res.data;
 
@@ -35,7 +34,7 @@ export default function LocationTracker() {
           geoOptions
         );
       } catch (err) {
-        console.error("Tracker: Could not verify user session", err);
+        console.error("Tracker: Session check failed", err);
       }
     };
 
@@ -46,5 +45,5 @@ export default function LocationTracker() {
     };
   }, []);
 
-  return null; // This component stays invisible
+  return null; 
 }
