@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import for navigation
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import Topbar from "../components/Topbar";
 import FaceAttendance from "../components/FaceAttendance";
@@ -9,18 +9,17 @@ import api from "../services/api";
 import "../styles/dashboard.css";
 
 export default function UserDashboard() {
-  const navigate = useNavigate(); // Hook for redirection
+  const navigate = useNavigate();
   const [status, setStatus] = useState("Offline");
   const [lastUpdate, setLastUpdate] = useState("--");
   const [user, setUser] = useState(null);
   const [todayExpenses, setTodayExpenses] = useState([]);
-  const [expense, setExpense] = useState({ type: "Travel", amount: "", note: "" });
+  const [locationError, setLocationError] = useState(false); // NEW: State for location error
 
   useEffect(() => {
-    // NEW: Immediate check for token presence
     const token = localStorage.getItem("token");
     if (!token) {
-      navigate("/"); // Redirect if no token exists
+      navigate("/");
       return;
     }
 
@@ -29,7 +28,7 @@ export default function UserDashboard() {
       .catch(err => console.error("Error fetching profile", err));
     
     fetchTodayExpenses();
-  }, [navigate]); // Added navigate to dependency array
+  }, [navigate]);
 
   const fetchTodayExpenses = async () => {
     try {
@@ -40,7 +39,6 @@ export default function UserDashboard() {
     }
   };
 
-  // --- BACKGROUND TRACKING LOGIC ---
   useEffect(() => {
     const socket = connectSocket();
     if (!socket || !user) return;
@@ -55,6 +53,7 @@ export default function UserDashboard() {
 
     const watchId = navigator.geolocation.watchPosition(
       (pos) => {
+        setLocationError(false); // Reset error on success
         socket.emit("sendLocation", {
           userId: user._id,
           name: user.name,
@@ -63,7 +62,10 @@ export default function UserDashboard() {
         });
         setLastUpdate(new Date().toLocaleTimeString());
       },
-      (err) => console.error("GPS Watch Error:", err),
+      (err) => {
+        console.error("GPS Watch Error:", err);
+        if (err.code === 1) setLocationError(true); // NEW: Set error if permission denied
+      },
       geoOptions
     );
 
@@ -77,6 +79,20 @@ export default function UserDashboard() {
     <div className="layout">
       <Sidebar />
       <div className="main-content">
+        {/* NEW: Top of page alert for location permissions */}
+        {locationError && (
+          <div style={{
+            background: "#fee2e2",
+            color: "#b91c1c",
+            padding: "12px",
+            textAlign: "center",
+            fontWeight: "bold",
+            borderBottom: "1px solid #f87171"
+          }}>
+            📍 Location access is disabled. Please enable GPS and allow browser permissions to share your live location.
+          </div>
+        )}
+
         <Topbar title="Field Officer Panel" />
         
         <div className="dashboard-container">
