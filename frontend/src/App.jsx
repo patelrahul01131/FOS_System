@@ -11,10 +11,15 @@ import MyExpenses from "./pages/MyExpenses";
 import OfficeExpenses from "./pages/OfficeExpenses";
 import UserExpenses from "./pages/UserExpenses";
 import UserHistory from "./pages/UserHistory";
+import LocationTracker from "./components/LocationTracker";
 
 export default function App() {
+
+  const token = localStorage.getItem("token");
+
   return (
     <BrowserRouter>
+      {token && <LocationTracker />}
       <Routes>
         {/* DEFAULT ROUTE */}
         <Route path="/" element={<Navigate to="/user/dashboard" />} />
