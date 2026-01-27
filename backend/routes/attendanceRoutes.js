@@ -41,7 +41,7 @@ router.post("/", auth, async (req, res) => {
     const { image, lat, lng } = req.body;
     const OFFICE_LAT = 24.264434461721187; 
     const OFFICE_LNG = 72.18390649958799;
-    const MAX_DISTANCE = 200; 
+    const MAX_DISTANCE = 500; 
 
     if (!lat || !lng) return res.status(400).json({ message: "Location required." });
 

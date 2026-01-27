@@ -68,7 +68,7 @@ export default function FaceAttendance() {
       const { latitude, longitude } = position.coords;
       const OFFICE_LAT = 24.264434461721187; 
       const OFFICE_LNG = 72.18390649958799;
-      const MAX_DISTANCE = 200; 
+      const MAX_DISTANCE = 500; 
 
       const distance = getDistance(latitude, longitude, OFFICE_LAT, OFFICE_LNG);
 
